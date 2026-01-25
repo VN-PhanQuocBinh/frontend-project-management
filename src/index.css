@@ -61,9 +61,12 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
   min-height: 100vh;
 }
 
@@ -102,6 +105,13 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+@theme {
+  --spacing-navbar-height: 48px;
+  --spacing-project-height: calc(100vh - var(--spacing-navbar-height));
+  --spacing-project-bar-height: 56px;
+  --spacing-project-content-height: calc(var(--spacing-project-height) - var(--spacing-project-bar-height));
 }
 
 @theme inline {

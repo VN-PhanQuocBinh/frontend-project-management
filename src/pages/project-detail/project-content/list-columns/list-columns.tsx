@@ -95,7 +95,7 @@ function ListColumns({ columns }: IProps) {
       <div className="w-full h-full flex overflow-x-auto overflow-y-hidden py-2">
         {columns?.map((column) => <Column key={column._id} column={column} />)}
         {!openNewColumnForm
-          ? <div className="w-60 min-w-60 mx-2 rounded-md h-fit">
+          ? <div className="w-60 min-w-60 mx-2 h-fit">
             
             <Button
               onClick={toggleOpenNewColumnForm}

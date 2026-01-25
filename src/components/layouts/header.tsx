@@ -1,9 +1,8 @@
-import { Search, Bell, Grid2X2, Megaphone } from "lucide-react";
+import {  Bell, Grid2X2 } from "lucide-react";
 import ProfilePopup from "../profile-popup";
 import NotificationPopup from "../notification-popup";
 import SearchBar from "../search-bar";
 import CreateBoardPopup from "../create-board-popup";
-import { Tooltip } from "../ui/tooltip";
 
 const Header = () => {
   return (

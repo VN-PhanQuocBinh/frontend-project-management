@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Search, ArrowUpRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Search } from "lucide-react";
 
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");

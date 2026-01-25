@@ -3,7 +3,7 @@ import { LayoutDashboard, Trello, Activity } from "lucide-react";
 
 const LeftSidebar = () => {
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-screen p-4">
+    <aside className="w-72 shrink-0 bg-white border-r border-gray-200 h-screen p-6">
       <nav className="space-y-1">
         {/* Bảng */}
         <button className="w-full flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">

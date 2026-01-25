@@ -1,6 +1,7 @@
 import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ExternalLink, LogOut } from "lucide-react";
+import { Tooltip } from "./ui/tooltip";
 
 interface ProfilePopupProps {
   children: React.ReactNode;
@@ -9,9 +10,14 @@ interface ProfilePopupProps {
 const ProfilePopup = ({ children }: ProfilePopupProps) => {
   return (
     <Popover>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
+      <Tooltip content="Tài khoản">
+        <PopoverTrigger asChild>{children}</PopoverTrigger>
+      </Tooltip>
 
-      <PopoverContent align="end" className="w-80 p-0 bg-white shadow-lg rounded-md border border-gray-200">
+      <PopoverContent
+        align="end"
+        className="w-80 p-0 bg-white shadow-lg rounded-md border border-gray-200"
+      >
         {/* Header - User Info */}
         <div className="p-4 border-b border-gray-200">
           <div className="text-xs font-semibold text-gray-500 mb-3">TÀI KHOẢN</div>

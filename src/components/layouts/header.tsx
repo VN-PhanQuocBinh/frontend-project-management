@@ -44,20 +44,16 @@ const Header = () => {
           </button> */}
 
           <NotificationPopup>
-            <Tooltip content="Thông báo">
-              <button className="p-2 hover:bg-gray-100 rounded">
-                <Bell className="w-5 h-5 text-gray-700" />
-              </button>
-            </Tooltip>
+            <button className="p-2 hover:bg-gray-100 rounded">
+              <Bell className="w-5 h-5 text-gray-700" />
+            </button>
           </NotificationPopup>
 
           {/* User Avatar */}
           <ProfilePopup>
-            <Tooltip content="Tài khoản">
-              <button className="w-8 h-8 rounded-full bg-orange-500 text-white font-semibold flex items-center justify-center hover:opacity-80">
-                PB
-              </button>
-            </Tooltip>
+            <button className="w-8 h-8 rounded-full bg-orange-500 text-white font-semibold flex items-center justify-center hover:opacity-80">
+              PB
+            </button>
           </ProfilePopup>
         </div>
       </div>

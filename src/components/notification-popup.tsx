@@ -1,6 +1,6 @@
 import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { MoreVertical } from "lucide-react";
+import { Tooltip } from "./ui/tooltip";
 
 interface NotificationPopupProps {
   children: React.ReactNode;
@@ -9,7 +9,9 @@ interface NotificationPopupProps {
 const NotificationPopup = ({ children }: NotificationPopupProps) => {
   return (
     <Popover>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
+      <Tooltip content="Thông báo">
+        <PopoverTrigger asChild>{children}</PopoverTrigger>
+      </Tooltip>
 
       <PopoverContent
         align="end"

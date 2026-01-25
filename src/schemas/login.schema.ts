@@ -1,9 +1,14 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  email: z.string().email("Email không hợp lệ"),
-  password: z.string().min(6, "Mật khẩu tối thiểu 6 ký tự"),
+  email: z
+    .string()
+    .min(1, "Email là bắt buộc")
+    .email("Email không hợp lệ"),
+  password: z
+    .string()
+    .min(1, "Mật khẩu là bắt buộc")
+    .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
 });
 
-// Infer type từ schema
 export type LoginFormValues = z.infer<typeof loginSchema>;

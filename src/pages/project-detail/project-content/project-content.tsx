@@ -24,7 +24,7 @@ import { arrayMove } from '@dnd-kit/sortable'
 import { generatePlaceholderCard } from '@/utils/formatters'
 
 import Column from './list-columns/column/column'
-import Card from './list-columns/column/card/card'
+import Card from './list-columns/column/list-cards/card/card'
 import { type Project, type Column as ColumnType, type Card as CardType } from '@/types/project'
 
 const ACTIVE_DRAG_ITEM_TYPE = {
@@ -37,11 +37,15 @@ type ActiveDragItemType = typeof ACTIVE_DRAG_ITEM_TYPE[keyof typeof ACTIVE_DRAG_
 interface ProjectContentProps {
   project: Project
   moveColumns: (dndOrderedColumns: ColumnType[]) => void
-  moveCardInTheSameColumn: (dndOrderedCards: CardType[], dndOrderedCardIds: string[], columnId: string) => void
+  moveCardInTheSameColumn: (
+    dndOrderedCards: CardType[] | undefined,
+    dndOrderedCardIds: UniqueIdentifier[] | undefined,
+    columnId: UniqueIdentifier | undefined
+  ) => void
   moveCardToDifferentColumn: (
-    currentCardId: string,
-    prevColumnId: string,
-    nextColumnId: string,
+    currentCardId: UniqueIdentifier | undefined,
+    prevColumnId: UniqueIdentifier | undefined,
+    nextColumnId: UniqueIdentifier | undefined,
     dndOrderedColumns: ColumnType[]
   ) => void
 }
@@ -95,20 +99,21 @@ function ProjectContent({
     activeDraggingCardData: CardType,
     triggerFrom: 'handleDragOver' | 'handleDragEnd'
   ): void => {
+    let nextColumns: ColumnType[] = []
+    
     setOrderedColumns((prevColumns) => {
       // tìm vị trí của active card sắp được thả
       const overCardIndex = overColumn.cards.findIndex((card) => card._id === overCardId)
 
       // đây là logic tính "cardIndex mới" (trên hoặc dưới của overCard) lấy chuẩn ra từ code của thư viện
-      let newCardIndex
       const isBelowOverItem =
         over && active.rect.current.translated &&
         active.rect.current.translated.top > over.rect.top + over.rect.height
       const modifier = isBelowOverItem ? 1 : 0
 
-      newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn.cards.length + 1
+      const newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overColumn.cards.length + 1
       // clone mảng orderedColumns ra 1 mảng mới
-      const nextColumns = cloneDeep(prevColumns)
+      nextColumns = cloneDeep(prevColumns)
       const nextActiveColumn = nextColumns.find((column) => column._id === activeColumn._id)
       const nextOverColumn = nextColumns.find((column) => column._id === overColumn._id)
       if (nextActiveColumn) {
@@ -117,7 +122,7 @@ function ProjectContent({
 
         nextActiveColumn.cards = nextActiveColumn.cards.filter((card) => !card.FE_PlaceholderCard)
         if (isEmpty(nextActiveColumn.cards)) {
-          nextActiveColumn.cards = [generatePlaceholderCard(nextActiveColumn)]
+          nextActiveColumn.cards = [generatePlaceholderCard(nextActiveColumn as ColumnType)]
         }
 
         // cập nhật lại mảng cardsOrderIds
@@ -133,7 +138,7 @@ function ProjectContent({
           columnId: nextOverColumn._id
         }
         // thêm card đang kéo vào overColumn theo index mới
-        nextOverColumn.cards = nextOverColumn.cards.toSpliced(
+        nextOverColumn.cards.splice(
           newCardIndex,
           0,
           rebuild_activeDraggingCardData
@@ -143,14 +148,14 @@ function ProjectContent({
         nextOverColumn.cardOrderIds = nextOverColumn.cards.map((card) => card._id)
       }
 
-      // Nếu func này được gọi từ handleDragEnd thì mới xử lý gọi API
-      if (triggerFrom === 'handleDragEnd') {
-        // Gọi lên hàm moveCardToDifferentColumn ở component cha cao nhất (_id.jsx)
-        moveCardToDifferentColumn(activeDraggingCardId, oldColumn._id, nextOverColumn._id, nextColumns)
-      }
-
       return nextColumns
     })
+    
+    // Nếu func này được gọi từ handleDragEnd thì mới xử lý gọi API
+    if (triggerFrom === 'handleDragEnd') {
+      // Gọi lên hàm moveCardToDifferentColumn ở component cha cao nhất (_id.jsx)
+      moveCardToDifferentColumn(activeDraggingCardId, oldColumn?._id, overColumn._id, nextColumns)
+    }
   }
 
   const handleDragStart = (event: DragStartEvent): void => {
@@ -233,11 +238,15 @@ function ProjectContent({
           const nextColumns = cloneDeep(prevColumns)
 
           const targetColumn = nextColumns.find((column) => column._id === overColumn._id)
-          targetColumn.cards = dndOrderedCards
-          targetColumn.cardOrderIds = dndOrderedCardIds
+          if (targetColumn) {
+            targetColumn.cards = dndOrderedCards
+          }
+          if (targetColumn) {
+            targetColumn.cardOrderIds = dndOrderedCardIds
+          }
           return nextColumns
         })
-        moveCardInTheSameColumn(dndOrderedCards, dndOrderedCardIds, oldColumn._id)
+        moveCardInTheSameColumn(dndOrderedCards, dndOrderedCardIds, oldColumn?._id)
       }
     } else if (activeDragItemType == ACTIVE_DRAG_ITEM_TYPE.COLUMN && active.id !== over.id) {
       const oldColumnIndex = orderedColumns.findIndex((column) => column._id === active.id)
@@ -269,7 +278,7 @@ function ProjectContent({
     // tìm những điểm giao nhau với con trỏ
     const pointerIntersections = pointerWithin(args)
 
-    if (!pointerIntersections?.length) return
+    if (!pointerIntersections?.length) return []
 
     // thuật toán phát hiện va chạm sẽ trả về 1 mảng các va chạm ở đây
     const intersections = pointerIntersections?.length > 0 ? pointerIntersections : rectIntersection(args)
@@ -287,7 +296,7 @@ function ProjectContent({
         overId = closestCorners({
           ...args,
           droppableContainers: args.droppableContainers.filter((container) => {
-            return (checkColumn?.cardOrderIds?.includes(container.id))
+            return (checkColumn?.cardOrderIds?.includes(container.id as string))
           })
         })[0]?.id
         // console.log('overId after:', overId)

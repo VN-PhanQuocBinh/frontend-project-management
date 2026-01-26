@@ -1,22 +1,24 @@
-import type { Column as ColumnType, Project } from '@/types/project'
+import type { Column as ColumnType } from '@/types/project'
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable'
-import { mockData } from '@/api/mock-data'
 import React, { useState } from 'react'
-import { cloneDeep } from 'lodash'
-import { generatePlaceholderCard } from '@/utils/formatters'
+// import { cloneDeep } from 'lodash'
+// import { generatePlaceholderCard } from '@/utils/formatters'
+import { useProjectStore } from '@/stores/project-store'
 import type { UniqueIdentifier } from '@dnd-kit/core'
 import Column from './column/column'
 import { Button } from '@/components/ui/button'
+import { toast } from "sonner"
 import { CirclePlus, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { generatePlaceholderCard } from '@/utils/formatters'
+import { cloneDeep } from 'lodash'
 
 interface IProps {
   columns: ColumnType[]
 }
 
 function ListColumns({ columns }: IProps) {
-  // const dispatch = useDispatch()
-  const project: Project = mockData.project  // giả sử lấy project đầu tiên từ mockData
+  const { setCurrentActiveProject, currentActiveProject } = useProjectStore()
 
   // SortableContent yêu cầu items dạng ['id-1', 'id-2'] chứ không phải [{id: 'id-1', id: 'id-2'}]
   // nếu không đúng thì vẫn kéo thả được nhưng không có animation
@@ -30,12 +32,15 @@ function ListColumns({ columns }: IProps) {
   const addNewColumn = async () => {
     if (!newColumnTitle) {
       // không cho tạo nếu title trống
+      toast("Vui lòng nhập tên cột", {
+          description: "Không thể tạo cột với tên trống.",
+        })
       return
     }
 
-    const newColumnData = {
-      title: newColumnTitle
-    }
+    // const newColumnData = {
+    //   title: newColumnTitle
+    // }
 
     // gọi API tạo mới column và làm lại dữ liệu State Board
     // const createdColumn = await createNewColumnAPI({
@@ -43,8 +48,17 @@ function ListColumns({ columns }: IProps) {
     //   boardId: board._id
     // })
 
-    // createdColumn.cards = [generatePlaceholderCard(createdColumn)]
-    // createdColumn.cardOrderIds = [generatePlaceholderCard(createdColumn)._id]
+    console.log('Gọi API tạo mới column với title:', newColumnTitle)
+    const createdColumn: ColumnType = {
+      _id: `col-${Date.now()}`,
+      title: newColumnTitle,
+      projectId: currentActiveProject?._id as string,
+      cards: [],
+      cardOrderIds: []
+    }
+
+    createdColumn.cards = [generatePlaceholderCard(createdColumn)]
+    createdColumn.cardOrderIds = [generatePlaceholderCard(createdColumn)._id]
 
     // tự làm lại state Board thay vì gọi lại fetchBoardAPI
     /**
@@ -54,9 +68,9 @@ function ListColumns({ columns }: IProps) {
      * dùng tới Deep Copy/Clone toàn bộ cái Board cho dễ hiểu và code ngắn gọn
      */
     // const newBoard = { ...board }
-    // const newBoard = cloneDeep(board)
-    // newBoard.columns.push(createdColumn)
-    // newBoard.columnOrderIds.push(createdColumn._id)
+    const newProject = cloneDeep(currentActiveProject)
+    newProject?.columns.push(createdColumn)
+    newProject?.columnOrderIds.push(createdColumn._id)
 
     /**
      * Ngoài cách đó ra thì vẫn có thể dùng array.concat thay cho push như docs của Redux Toolkit ở trên vì push
@@ -69,7 +83,7 @@ function ListColumns({ columns }: IProps) {
 
     // setBoard(newBoard)
     // Cập nhật dữ liệu trong Redux (Redux store)
-    // dispatch(updateCurrentActiveBoard(newBoard))
+    setCurrentActiveProject(newProject as typeof currentActiveProject)
 
     toggleOpenNewColumnForm()
     setNewColumnTitle('')

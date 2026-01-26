@@ -1,6 +1,8 @@
+import type { UniqueIdentifier } from "@dnd-kit/core";
+
 export interface Card {
   _id: string;
-  projectId: string;
+  projectId?: string;
   columnId: string;
   title?: string;
   description?: string | null;
@@ -28,4 +30,11 @@ export interface Project {
   memberIds: string[];
   columnOrderIds: string[];
   columns: Column[];
+}
+
+export interface ProjectStore {
+  currentActiveProject: Project | null;
+  setCurrentActiveProject: (project: Project | null) => void;
+  updateCardInProject: (updatedCard: Card) => void;
+  fetchProjectDetailsAPI: (projectId: UniqueIdentifier) => Promise<void>;
 }

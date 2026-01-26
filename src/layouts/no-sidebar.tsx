@@ -6,7 +6,7 @@ export default function NoSidebar() {
     <>
       <Toaster />
       <header className="h-navbar-height">Header</header>
-      <main className="h-project-height bg-amber-100 overflow-hidden">
+      <main className="h-project-height bg-amber-100 overflow-x-hidden">
         <Outlet />
       </main>
     </>

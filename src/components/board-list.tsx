@@ -25,7 +25,9 @@ const BoardItem = ({ board, onClick }: { board: Board; onClick?: (boardId: strin
       className="w-full p-4 bg-white border group border-gray-200 rounded-lg hover:bg-gray-50 shadow-md transition-all text-left"
     >
       {/* Title */}
-      <h3 className="text-base font-semibold text-gray-900 group-hover:text-blue-800 mb-2">{board.title}</h3>
+      <h3 className="text-base font-semibold text-gray-900 group-hover:text-blue-800 mb-2">
+        {board.title}
+      </h3>
 
       {/* Creator Info */}
       <div className="flex items-center gap-2">

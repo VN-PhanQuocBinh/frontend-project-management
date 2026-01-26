@@ -89,13 +89,9 @@ button {
   cursor: pointer;
 }
 
-.custom-scrollbar {
-}
-
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-
-  appearance: none;
+  width: 8px;
+  height: 8px;
 }
 
 @theme {
@@ -183,9 +179,28 @@ button {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-gray-300;
-  border-radius: 4px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Firefox scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(209 213 219) transparent;
+}
+
+@layer utilities {
+  .bg-column {
+    background-color: #f1f2f4;
+  }
 }

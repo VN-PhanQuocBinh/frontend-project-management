@@ -156,7 +156,7 @@ function Column({ column }: IProps) {
       <div
         {...attributes}
         {...listeners}
-        className="min-w-75 max-w-75 ml-2 pr-3 rounded-md h-fit"
+        className="min-w-68 max-w-68 ml-2 pr-1 rounded-md h-fit bg-column"
       >
         <div
           className="p-2 flex items-center justify-between min-h-8"
@@ -190,6 +190,7 @@ function Column({ column }: IProps) {
             >
               <Button
                 onClick={toggleOpenNewCardForm}
+                variant="ghost"
               >
                 <CirclePlus />
                 Add new card
@@ -203,7 +204,7 @@ function Column({ column }: IProps) {
             <div
               className="h-full flex items-center gap-1"
             >
-              <Input value={newCardTitle} onChange={(e) => setNewCardTitle(e.target.value)} />
+              <Input autoFocus value={newCardTitle} onChange={(e) => setNewCardTitle(e.target.value)} />
               <div className="flex items-center gap-1">
                 <Button onClick={addNewCard}>
                   Add

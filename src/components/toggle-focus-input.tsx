@@ -32,13 +32,12 @@ function ToggleFocusInput({ value, onChangedValue, inputFontSize = '16px', ...pr
 
   return (
     <Input
-      id="toggle-focus-input-controlled"
       value={inputValue}
       onChange={(event) => { setInputValue(event.target.value) }}
       onBlur={triggerBlur}
       {...props}
       // Magic here :D
-      className='font-bold bg-transparent border-transparent focus:bg-white focus:border-primary px-1'
+      className='font-bold bg-transparent border-transparent focus:bg-white focus:border-primary px-1 shadow-none'
     />
   )
 }

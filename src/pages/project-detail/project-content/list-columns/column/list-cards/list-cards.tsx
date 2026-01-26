@@ -16,7 +16,7 @@ function ListCards({ cards }: IProps) {
 
   return (
     <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
-      <div className='flex flex-col gap-1 overflow-x-hidden overflow-y-auto max-h-120'>
+      <div className='flex flex-col gap-2 overflow-x-hidden overflow-y-auto max-h-110 pt-0 pr-1 pb-2 pl-2'>
         {cards.map((card) => <Card key={card._id} card={card} />)}
       </div>
     </SortableContext>

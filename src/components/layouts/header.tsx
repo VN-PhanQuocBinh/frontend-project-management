@@ -3,10 +3,11 @@ import ProfilePopup from "../profile-popup";
 import NotificationPopup from "../notification-popup";
 import SearchBar from "../search-bar";
 import CreateBoardPopup from "../create-board-popup";
+import { cn } from "@/lib/utils";
 
-const Header = () => {
+const Header = ({ className }: { className?: string }) => {
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-2">
+    <header className={cn("bg-white border-b border-gray-200 px-4 py-2", className)}>
       <div className="flex items-center justify-between">
         {/* Left Section */}
         <div className="flex items-center gap-4">

@@ -15,9 +15,10 @@ import { cn } from '@/lib/utils'
 
 interface IProps {
   card: CardType
+  onClick?: (cardId: string) => void
 }
 
-function CardItem({ card }: IProps) {
+function CardItem({ card, onClick }: IProps) {
   // const dispatch = useDispatch()
 
   const {
@@ -45,12 +46,6 @@ function CardItem({ card }: IProps) {
   // !!card?.comments?.length ||
   // !!card?.attachments?.length
 
-  const setActiveCard = () => {
-    // Cập nhật activeCard trong Redux
-    // dispatch(updateCurrentActiveCard(card))
-    // Hiện modal
-    // dispatch(showModalActiveCard())
-  }
 
   return (
     <Card
@@ -58,7 +53,7 @@ function CardItem({ card }: IProps) {
       style={dndKitCardStyles}
       {...attributes}
       {...listeners}
-      onClick={setActiveCard}
+      onClick={() => onClick?.(card._id)}
       className={cn(
         card?.FE_PlaceholderCard ? 'hidden' : 'block',
         'cursor-pointer hover:shadow-md transition-shadow rounded-lg p-0'

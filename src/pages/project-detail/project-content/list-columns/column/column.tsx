@@ -155,7 +155,7 @@ function Column({ column }: IProps) {
     <div ref={setNodeRef} style={dndKitColumnStyles}>
       <div
         {...attributes}
-        {...listeners}
+        
         className="min-w-68 max-w-68 ml-2 pr-1 rounded-md h-fit bg-column"
       >
         <div
@@ -198,7 +198,7 @@ function Column({ column }: IProps) {
               {/* <Tooltip title="Drag to move">
                 <DragIndicatorIcon sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }} />
               </Tooltip> */}
-              <GripVertical className='cursor-grab' />
+              <GripVertical className='cursor-grab' {...listeners} />
             </div>
           ) : (
             <div

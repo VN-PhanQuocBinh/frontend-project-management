@@ -1,5 +1,8 @@
 import BoardList from "@/components/board-list";
 
+console.log("Hello from An");
+console.log("Test");
+
 function HomePage() {
   const sampleBoards = [
     {
@@ -112,7 +115,11 @@ function HomePage() {
         <h1 className="text-2xl font-bold text-gray-900">Bảng của bạn</h1>
       </div>
 
-      <BoardList className="flex-1" boards={sampleBoards} onBoardClick={handleBoardClick} />
+      <BoardList
+        className="flex-1"
+        boards={sampleBoards}
+        onBoardClick={handleBoardClick}
+      />
     </div>
   );
 }

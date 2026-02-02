@@ -1,6 +1,7 @@
 import BoardList from "@/components/board-list";
 
 console.log("Hello from An");
+console.log("Test");
 
 function HomePage() {
   const sampleBoards = [

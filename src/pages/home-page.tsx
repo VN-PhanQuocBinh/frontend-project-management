@@ -2,6 +2,9 @@ import BoardList from "@/components/board-list";
 
 console.log("Hello from An");
 console.log("Test");
+console.log(
+  "Thai Binh"
+);
 
 function HomePage() {
   const sampleBoards = [

@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+---
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 🚀 PROJECT MANAGEMENT
 
-Currently, two official plugins are available:
+Dự án này được xây dựng bằng **ReactJS**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🔗 Live Demo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Bạn có thể xem trực tiếp bản deploy của dự án tại đây: 
 
-## Expanding the ESLint configuration
+### 👉 **[https://my-awesome-app.vercel.app]([https://my-awesome-app.vercel.app](https://www.google.com/search?q=https://my-awesome-app.vercel.app))**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠 Công nghệ sử dụng
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Dự án được phát triển dựa trên các công nghệ chính:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+* **Frontend:** React (Vite/CRA), TailwindCSS, Redux Toolkit.
+* **Backend (nếu có):** Firebase, Node.js.
+* **Deployment:** Vercel / Netlify.
+
+## ⚙️ Hướng dẫn cài đặt dưới Local
+
+Nếu bạn muốn chạy dự án này trên máy tính cá nhân, hãy làm theo các bước sau:
+
+1. **Clone dự án:**
+```bash
+git clone https://github.com/username/project-name.git
+
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+2. **Di chuyển vào thư mục dự án:**
+```bash
+cd project-name
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+
+
+3. **Cài đặt các gói phụ thuộc:**
+```bash
+npm install
+# hoặc
+yarn install
+
+```
+
+
+4. **Chạy ứng dụng ở chế độ development:**
+```bash
+npm run dev
+# hoặc
+yarn dev
+
+```
+
+
+Mở [http://localhost:5173](https://www.google.com/search?q=http://localhost:5173) để xem kết quả trên trình duyệt.
+
+## 📸 Ảnh chụp màn hình (Screenshot)
+
+---
+
+## 👤 Tác giả
+
+* **Họ và tên:** [Tên của bạn]
+* **GitHub:** [@username](https://www.google.com/search?q=https://github.com/username)
+* **Email:** [email@example.com]
+
+---
+
+> **Lưu ý:** Nếu bạn có sử dụng các biến môi trường (`.env`), đừng quên liệt kê các key cần thiết (nhưng không kèm value) vào file này để người khác biết cách cấu hình nhé!
+
+Bạn có muốn tôi tùy chỉnh thêm phần **Tính năng nổi bật (Features)** dựa trên chức năng cụ thể của dự án bạn không?

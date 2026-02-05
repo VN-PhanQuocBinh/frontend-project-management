@@ -10,7 +10,7 @@ Dự án này được xây dựng bằng **ReactJS**.
 
 Bạn có thể xem trực tiếp bản deploy của dự án tại đây: 
 
-### 👉 **[https://my-awesome-app.vercel.app]([https://my-awesome-app.vercel.app](https://www.google.com/search?q=https://my-awesome-app.vercel.app))**
+### 👉 **[https://my-awesome-app.vercel.app](https://frontend-project-management-lac.vercel.app/)**
 
 ---
 

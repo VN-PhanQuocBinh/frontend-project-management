@@ -11,6 +11,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth-store";
 
+import { authApi } from "@/api/auth.api";
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -26,24 +28,20 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Login data:", data);
 
-      // Mock response from API
-      const mockUser = {
-        id: "1",
-        name: "Phan Quốc Bình",
-        email: data.email,
-        avatar: "",
-      };
+      const response = await authApi.login({
+        username: data.username,
+        password: data.password,
+      });
 
-      const mockToken = "mock-jwt-token";
+      console.log("Login response:", response);
 
       // Save to store
-      login(mockUser, mockToken);
+      login(response.user, response.token);
 
       toast.success("Đăng nhập thành công!", {
-        description: `Chào mừng ${mockUser.name}!`,
+        description: `Chào mừng ${response.user.username}!`,
         duration: 4000,
       });
 
@@ -68,7 +66,7 @@ export default function LoginPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-lg mb-4">
                 <span className="text-2xl font-bold">T</span>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">Đăng nhập vào Trucllo</h1>
+              <h1 className="text-2xl! font-bold text-gray-900 mb-2">Đăng nhập vào Trucllo</h1>
               <p className="text-gray-600">Chào mừng bạn quay trở lại!</p>
             </div>
 
@@ -77,20 +75,20 @@ export default function LoginPage() {
               <FieldSet>
                 <FieldGroup>
                   {/* Email Field */}
-                  <Field data-invalid={!!errors.email} className="gap-1">
-                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <Field data-invalid={!!errors.username} className="gap-1">
+                    <FieldLabel htmlFor="username">Tài khoản</FieldLabel>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                       <Input
-                        id="email"
-                        type="email"
-                        placeholder="example@email.com"
+                        id="username"
+                        type="text"
+                        placeholder="Nhập tên tài khoản của bạn"
                         className="pl-10"
-                        {...register("email")}
+                        {...register("username")}
                       />
                     </div>
-                    {errors.email && (
-                      <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
+                    {errors.username && (
+                      <p className="text-sm text-red-600 mt-1">{errors.username.message}</p>
                     )}
                   </Field>
 
@@ -110,7 +108,7 @@ export default function LoginPage() {
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
+                        placeholder="Nhập mật khẩu của bạn"
                         className="pl-10 pr-10"
                         {...register("password")}
                       />

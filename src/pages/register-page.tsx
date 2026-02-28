@@ -10,6 +10,7 @@ import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth-store";
+import { authApi } from "@/api/auth.api";
 
 export default function RegisterPage() {
   const { isLoading, register: authRegister } = useAuthStore();
@@ -26,23 +27,20 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Register data:", data);
 
-      console.log(data);
+      const response = await authApi.register({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      });
 
-      authRegister(
-        {
-          id: "2",
-          name: data.name,
-          email: data.email,
-          avatar: "",
-        },
-        "mock-jwt-token",
-      );
+      console.log("Register response:", response);
+
+      authRegister(response.user, response.token);
 
       toast.success("Đăng ký thành công!", {
-        description: `Chào mừng ${data.name}!`,
+        description: `Chào mừng ${response.user.username}!`,
         duration: 4000,
       });
     } catch (error) {
@@ -73,20 +71,20 @@ export default function RegisterPage() {
               <FieldSet>
                 <FieldGroup>
                   {/* Name Field */}
-                  <Field data-invalid={!!errors.name} className="gap-1">
-                    <FieldLabel htmlFor="name">Tên</FieldLabel>
+                  <Field data-invalid={!!errors.username} className="gap-1">
+                    <FieldLabel htmlFor="username">Tên tài khoản</FieldLabel>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                       <Input
-                        id="name"
+                        id="username"
                         type="text"
                         placeholder="Nguyễn Văn A"
                         className="pl-10"
-                        {...register("name")}
+                        {...register("username")}
                       />
                     </div>
-                    {errors.name && (
-                      <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>
+                    {errors.username && (
+                      <p className="text-sm text-red-600 mt-1">{errors.username.message}</p>
                     )}
                   </Field>
 
@@ -116,7 +114,7 @@ export default function RegisterPage() {
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
+                        placeholder="Nhập mật khẩu của bạn"
                         className="pl-10 pr-10"
                         {...register("password")}
                       />
@@ -145,7 +143,7 @@ export default function RegisterPage() {
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
-                        placeholder="••••••••"
+                        placeholder="Nhập lại mật khẩu của bạn"
                         className="pl-10 pr-10"
                         {...register("confirmPassword")}
                       />

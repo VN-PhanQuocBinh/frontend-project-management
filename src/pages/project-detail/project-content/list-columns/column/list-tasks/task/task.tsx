@@ -29,7 +29,7 @@ function CardItem({ card, onClick }: IProps) {
     transition,
     isDragging
   } = useSortable({
-    id: card._id,
+    id: card.id,
     data: { ...card }
   })
   // Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
@@ -53,7 +53,7 @@ function CardItem({ card, onClick }: IProps) {
       style={dndKitCardStyles}
       {...attributes}
       {...listeners}
-      onClick={() => onClick?.(card._id)}
+      onClick={() => onClick?.(card.id)}
       className={cn(
         card?.FE_PlaceholderCard ? 'hidden' : 'block',
         'cursor-pointer hover:shadow-md transition-shadow rounded-lg p-0'

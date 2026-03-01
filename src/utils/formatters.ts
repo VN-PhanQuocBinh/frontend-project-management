@@ -2,9 +2,9 @@ import type { Column } from "@/types/project"
 
 export const generatePlaceholderCard = (column: Column) => {
   return {
-    _id: `${column._id}-placeholder-card`,
+    id: `${column.id}-placeholder-card`,
     boardId: column.projectId,
-    columnId: column._id,
+    columnId: column.id,
     FE_PlaceholderCard: true
   }
 }

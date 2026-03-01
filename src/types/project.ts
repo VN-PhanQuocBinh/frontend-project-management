@@ -1,7 +1,7 @@
 import type { UniqueIdentifier } from "@dnd-kit/core";
 
 export interface Card {
-  _id: string;
+  id: string;
   projectId?: string;
   columnId: string;
   title?: string;
@@ -14,22 +14,24 @@ export interface Card {
 }
 
 export interface Column {
-  _id: string;
+  id: string;
   projectId: string;
-  title: string;
-  cardOrderIds: string[];
-  cards: Card[];
+  // title: string;
+  name: string;
+  taskOrderIds: string[];
+  tasks: Card[];
 }
 
 export interface Project {
-  _id: string;
-  title: string;
+  id: string;
+  // title?: string;
+  name?: string;
   description: string;
   type: 'public' | 'private';
   ownerIds: string[];
   memberIds: string[];
   columnOrderIds: string[];
-  columns: Column[];
+  boardColumns: Column[];
 }
 
 export interface ProjectStore {

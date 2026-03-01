@@ -14,10 +14,10 @@ import { generatePlaceholderCard } from '@/utils/formatters'
 import { cloneDeep } from 'lodash'
 
 interface IProps {
-  columns: ColumnType[]
+  boardColumns: ColumnType[]
 }
 
-function ListColumns({ columns }: IProps) {
+function ListColumns({ boardColumns }: IProps) {
   const { setCurrentActiveProject, currentActiveProject } = useProjectStore()
 
   // SortableContent yêu cầu items dạng ['id-1', 'id-2'] chứ không phải [{id: 'id-1', id: 'id-2'}]
@@ -45,20 +45,21 @@ function ListColumns({ columns }: IProps) {
     // gọi API tạo mới column và làm lại dữ liệu State Board
     // const createdColumn = await createNewColumnAPI({
     //   ...newColumnData,
-    //   boardId: board._id
+    //   boardId: board.id
     // })
 
     console.log('Gọi API tạo mới column với title:', newColumnTitle)
     const createdColumn: ColumnType = {
-      _id: `col-${Date.now()}`,
-      title: newColumnTitle,
-      projectId: currentActiveProject?._id as string,
-      cards: [],
-      cardOrderIds: []
+      id: `col-${Date.now()}`,
+      // title: newColumnTitle,
+      name: newColumnTitle,
+      projectId: currentActiveProject?.id as string,
+      tasks: [],
+      taskOrderIds: []
     }
 
-    createdColumn.cards = [generatePlaceholderCard(createdColumn)]
-    createdColumn.cardOrderIds = [generatePlaceholderCard(createdColumn)._id]
+    createdColumn.tasks = [generatePlaceholderCard(createdColumn)]
+    createdColumn.taskOrderIds = [generatePlaceholderCard(createdColumn).id]
 
     // tự làm lại state Board thay vì gọi lại fetchBoardAPI
     /**
@@ -69,8 +70,8 @@ function ListColumns({ columns }: IProps) {
      */
     // const newBoard = { ...board }
     const newProject = cloneDeep(currentActiveProject)
-    newProject?.columns.push(createdColumn)
-    newProject?.columnOrderIds.push(createdColumn._id)
+    newProject?.boardColumns.push(createdColumn)
+    newProject?.columnOrderIds.push(createdColumn.id)
 
     /**
      * Ngoài cách đó ra thì vẫn có thể dùng array.concat thay cho push như docs của Redux Toolkit ở trên vì push
@@ -78,8 +79,8 @@ function ListColumns({ columns }: IProps) {
      * một mảng mới để chúng ta gán lại giá trị nên không vấn đề gì
      */
     // const newBoard = { ...board }
-    // newBoard.columns = newBoard.columns.concat([createdColumn])
-    // newBoard.columnOrderIds = newBoard.columnOrderIds.concat([createdColumn._id])
+    // newBoard.boardColumns = newBoard.boardColumns.concat([createdColumn])
+    // newBoard.columnOrderIds = newBoard.columnOrderIds.concat([createdColumn.id])
 
     // setBoard(newBoard)
     // Cập nhật dữ liệu trong Redux (Redux store)
@@ -99,15 +100,15 @@ function ListColumns({ columns }: IProps) {
   }
 
   // const columnIds = useMemo(() => {
-  //   return columns?.map((column) => column._id)
-  // }, [columns])
+  //   return boardColumns?.map((column) => column.id)
+  // }, [boardColumns])
 
-  const columnIds: UniqueIdentifier[] = columns?.map((column) => column._id)
+  const columnIds: UniqueIdentifier[] = boardColumns?.map((column) => column.id)
 
   return (
     <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
       <div className="w-full h-full flex overflow-x-auto overflow-y-hidden py-2">
-        {columns?.map((column) => <Column key={column._id} column={column} />)}
+        {boardColumns?.map((column) => <Column key={column.id} column={column} />)}
         {!openNewColumnForm
           ? <div className="w-60 min-w-60 mx-2 h-fit">
             

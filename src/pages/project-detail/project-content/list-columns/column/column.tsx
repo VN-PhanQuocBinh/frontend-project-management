@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 // import ToggleFocusInput from '~/components/Form/ToggleFocusInput'
-import ListCards from './list-cards/list-cards'
+import ListCards from './list-tasks/list-tasks'
 import type { Column as ColumnType, Card as CardType } from '@/types/project'
 import { Button } from '@/components/ui/button'
 import { CirclePlus, Ellipsis, GripVertical, X } from 'lucide-react'
@@ -42,7 +42,7 @@ function Column({ column }: IProps) {
     transition,
     isDragging
   } = useSortable({
-    id: column._id,
+    id: column.id,
     data: { ...column }
   })
   // Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
@@ -55,7 +55,7 @@ function Column({ column }: IProps) {
     opacity: isDragging ? '0.5' : undefined
   }
 
-  const orderedCards: CardType[] = column.cards
+  const orderedCards: CardType[] = column.tasks
   const [openNewCardForm, setOpenNewCardForm] = useState(false)
   const toggleOpenNewCardForm = () => {
     setOpenNewCardForm(!openNewCardForm)
@@ -82,21 +82,21 @@ function Column({ column }: IProps) {
     }
     // const newCardData = {
     //   title: newCardTitle,
-    //   columnId: column._id
+    //   columnId: column.id
     // }
 
     // gọi api tạo mới column và làm lại dữ liệu State Board
     // const createdCard = await createNewCardAPI({
     //   ...newCardData,
-    //   boardId: board._id
+    //   boardId: board.id
     // })
 
     console.log('Gọi API tạo mới card với title:', newCardTitle)
     const createdCard: CardType = {
-      _id: `card-${Date.now()}`,
+      id: `card-${Date.now()}`,
       title: newCardTitle,
-      projectId: currentActiveProject?._id as string,
-      columnId: column._id,
+      projectId: currentActiveProject?.id as string,
+      columnId: column.id,
       description: '',
       attachments: [],
       comments: []
@@ -106,16 +106,16 @@ function Column({ column }: IProps) {
     // const newBoard = { ...board }
     // Tương tự createNewColumn, chỗ này phải dùng deep copy (cloneDeep)
     const newProject = cloneDeep(currentActiveProject)
-    const columnToUpdate = newProject?.columns.find((column) => column._id === createdCard.columnId)
+    const columnToUpdate = newProject?.boardColumns.find((column) => column.id === createdCard.columnId)
     if (columnToUpdate) {
-      // Trường hợp mảng cards rỗng
-      if (columnToUpdate.cards.some((card) => card.FE_PlaceholderCard)) {
-        columnToUpdate.cards = [createdCard]
-        columnToUpdate.cardOrderIds = [createdCard._id]
+      // Trường hợp mảng tasks rỗng
+      if (columnToUpdate.tasks.some((card) => card.FE_PlaceholderCard)) {
+        columnToUpdate.tasks = [createdCard]
+        columnToUpdate.taskOrderIds = [createdCard.id]
       } else {
         // Ngược lại
-        columnToUpdate.cards.push(createdCard)
-        columnToUpdate.cardOrderIds.push(createdCard._id)
+        columnToUpdate.tasks.push(createdCard)
+        columnToUpdate.taskOrderIds.push(createdCard.id)
       }
     }
     // // setBoard(newBoard)
@@ -130,20 +130,20 @@ function Column({ column }: IProps) {
   const handleDeleteColumn = () => {
       const newProject = { ...currentActiveProject }
       // Không vi phạm Immutability của Redux
-      newProject.columns = newProject?.columns?.filter((c) => c._id !== column._id)
-      newProject.columnOrderIds = newProject?.columnOrderIds?.filter((_id) => _id !== column._id)
+      newProject.boardColumns = newProject?.boardColumns?.filter((c) => c.id !== column.id)
+      newProject.columnOrderIds = newProject?.columnOrderIds?.filter((id) => id !== column.id)
       // setBoard(newBoard)
       setCurrentActiveProject(newProject as typeof currentActiveProject)
       // Gọi API
-      console.log('Gọi API xóa column với id:', column._id)
+      console.log('Gọi API xóa column với id:', column.id)
   }
 
   const onUpdateColumnTitle = (newTitle: string) => {
     console.log('New title:', newTitle)
     // Gọi API update column và xử lý dữ liệu board trong Redux
-    // updateColumnDetailsAPI(column._id, { title: newTitle }).then(() => {
+    // updateColumnDetailsAPI(column.id, { title: newTitle }).then(() => {
     //   const newBoard = cloneDeep(board)
-    //   const columnToUpdate = newBoard.columns.find((c) => c._id === column._id)
+    //   const columnToUpdate = newBoard.boardColumns.find((c) => c.id === column.id)
     //   if (columnToUpdate) columnToUpdate.title = newTitle
     //   // setBoard(newBoard)
     //   dispatch(updateCurrentActiveBoard(newBoard))
@@ -161,7 +161,7 @@ function Column({ column }: IProps) {
         <div
           className="p-2 flex items-center justify-between min-h-8"
         >
-          <ToggleFocusInput value={column?.title}
+          <ToggleFocusInput value={column?.name}
             onChangedValue={onUpdateColumnTitle} />
           <div>
             <DropdownMenu>
@@ -180,7 +180,7 @@ function Column({ column }: IProps) {
             </DropdownMenu>
           </div>
         </div>
-        <ListCards cards={orderedCards} />
+        <ListCards tasks={orderedCards} />
         <div
           className="p-2 min-h-8"
         >

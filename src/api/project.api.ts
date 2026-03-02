@@ -2,8 +2,20 @@
 import type { Column, Project } from "@/types/project";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import axiosClient from "./axios-client";
+import { useProjectStore } from "@/stores/project-store";
+import type { AxiosResponse } from "axios";
 
 // Project
+export const createProjectAPI = async (projectData: { name: string }) => {
+  const res = await axiosClient.post("/projects", projectData);
+  const newProject = res.data;
+
+  const currentProjects = useProjectStore.getState().projects;
+  currentProjects.push(newProject);
+
+  useProjectStore.getState().setProjects(currentProjects);
+}
+
 export const updateProjectDetailsAPI = async (
   projectId: UniqueIdentifier,
   updateData: Project,
@@ -45,3 +57,12 @@ export const updateColumnDetailsAPI = async (
   console.log("Gọi API update column details trong file project.api.ts");
   axiosClient.put(`/board-columns/${columnId}`, updateData);
 };
+
+// Column
+export const createNewColumnAPI = async (columnData: {
+  name: string;
+  projectId: string; 
+}): Promise<Column> => {
+  const createdColumn: Column = await axiosClient.post("/board-columns", columnData);
+  return createdColumn;
+}

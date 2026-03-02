@@ -34,9 +34,20 @@ export interface Project {
   boardColumns: Column[];
 }
 
+export interface ProjectItem {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  members: string[] | null;
+  owner: string;
+}
+
 export interface ProjectStore {
   currentActiveProject: Project | null;
+  projects: ProjectItem[];
   setCurrentActiveProject: (project: Project | null) => void;
+  setProjects: (projects: ProjectItem[]) => void;
   updateCardInProject: (updatedCard: Card) => void;
   fetchProjectDetailsAPI: (projectId: UniqueIdentifier) => Promise<void>;
 }

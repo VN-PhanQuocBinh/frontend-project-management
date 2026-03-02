@@ -8,7 +8,11 @@ export const authApi = {
     return response.data;
   },
 
-  async register(payload: { username: string; email: string; password: string }) {
+  async register(payload: {
+    username: string;
+    email: string;
+    password: string;
+  }) {
     const response = await axiosClient.post("/auth/register", payload);
     return response.data;
   },

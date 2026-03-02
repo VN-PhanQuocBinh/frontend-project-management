@@ -7,7 +7,9 @@ import axiosClient from "@/api/axios-client";
 
 export const useProjectStore = create<ProjectStore>((set) => ({
   currentActiveProject: null,
+  projects: [],
   setCurrentActiveProject: (project) => set({ currentActiveProject: project }),
+  setProjects: (projects) => set({ projects }),
   updateCardInProject: (updatedCard) =>
     set((state) => {
       const project = state.currentActiveProject;

@@ -12,7 +12,7 @@ const RightSidebar = () => {
               <span className="bg-gray-300 px-2 py-1 rounded-md">
                 <Plus className="w-5 h-5 " />
               </span>
-              Tạo bảng mới
+              Tạo dự án mới
             </button>
           </CreateBoardPopup>
         </div>

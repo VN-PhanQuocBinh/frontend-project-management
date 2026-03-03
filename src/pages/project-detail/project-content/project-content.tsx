@@ -40,7 +40,7 @@ interface ProjectContentProps {
   moveCardInTheSameColumn: (
     dndOrderedCards: CardType[] | undefined,
     dndOrderedCardIds: UniqueIdentifier[] | undefined,
-    columnId: UniqueIdentifier | undefined
+    boardColumnId: UniqueIdentifier | undefined
   ) => void
   moveCardToDifferentColumn: (
     currentCardId: UniqueIdentifier | undefined,
@@ -132,10 +132,10 @@ function ProjectContent({
       if (nextOverColumn) {
         // kiểm tra xem card đang kéo có tồn tại trong overColumn hay chưa, nếu có thì cần phải xóa nó trước
         nextOverColumn.tasks = nextOverColumn.tasks.filter((card) => card.id !== activeDraggingCardId)
-        // đối với trường hợp dragEnd thì phải cập nhật lại chuẩn dữ liệu columnId trong card sau khi kéo giữa 2 boardColumns khác nhau
+        // đối với trường hợp dragEnd thì phải cập nhật lại chuẩn dữ liệu boardColumnId trong card sau khi kéo giữa 2 boardColumns khác nhau
         const rebuild_activeDraggingCardData = {
           ...activeDraggingCardData,
-          columnId: nextOverColumn.id
+          boardColumnId: nextOverColumn.id
         }
         // thêm card đang kéo vào overColumn theo index mới
         nextOverColumn.tasks.splice(
@@ -160,10 +160,10 @@ function ProjectContent({
 
   const handleDragStart = (event: DragStartEvent): void => {
     setActiveDragItemId(event?.active?.id)
-    setActiveDragItemType(event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
+    setActiveDragItemType(event?.active?.data?.current?.boardColumnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
     setActiveDragItemData(event?.active?.data?.current as ColumnType | CardType)
 
-    if (event?.active?.data?.current?.columnId) {
+    if (event?.active?.data?.current?.boardColumnId) {
       setOldColumn(findColumnByCardId(event?.active?.id) ?? null)
     }
   }
@@ -213,7 +213,7 @@ function ProjectContent({
 
       // nếu không tồn tại thì return để tránh crash
       if (!activeColumn || !overColumn) return
-      // dùng oldColumn.id hoặc activeDragItemData.columnId được set từ lúc drag start
+      // dùng oldColumn.id hoặc activeDragItemData.boardColumnId được set từ lúc drag start
       if (oldColumn!.id !== overColumn.id) {
         moveCardBetweenDifferentColumns(
           overColumn,

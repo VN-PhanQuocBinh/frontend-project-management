@@ -26,6 +26,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { createNewTaskAPI } from '@/api/project.api'
 
 interface IProps {
   column: ColumnType
@@ -82,7 +83,7 @@ function Column({ column }: IProps) {
     }
     // const newCardData = {
     //   title: newCardTitle,
-    //   columnId: column.id
+    //   boardColumnId: column.id
     // }
 
     // gọi api tạo mới column và làm lại dữ liệu State Board
@@ -92,21 +93,28 @@ function Column({ column }: IProps) {
     // })
 
     console.log('Gọi API tạo mới card với title:', newCardTitle)
-    const createdCard: CardType = {
-      id: `card-${Date.now()}`,
+
+    const createdCard: CardType = await createNewTaskAPI({
       title: newCardTitle,
       projectId: currentActiveProject?.id as string,
-      columnId: column.id,
-      description: '',
-      attachments: [],
-      comments: []
-    }
+      boardColumnId: column.id
+    })
+
+    // const createdCard: CardType = {
+    //   id: `card-${Date.now()}`,
+    //   title: newCardTitle,
+    //   projectId: currentActiveProject?.id as string,
+    //   boardColumnId: column.id,
+    //   description: '',
+    //   attachments: [],
+    //   comments: []
+    // }
 
     // tự làm lại state Board thay vì gọi lại fetchBoardAPI
     // const newBoard = { ...board }
     // Tương tự createNewColumn, chỗ này phải dùng deep copy (cloneDeep)
     const newProject = cloneDeep(currentActiveProject)
-    const columnToUpdate = newProject?.boardColumns.find((column) => column.id === createdCard.columnId)
+    const columnToUpdate = newProject?.boardColumns.find((column) => column.id === createdCard.boardColumnId)
     if (columnToUpdate) {
       // Trường hợp mảng tasks rỗng
       if (columnToUpdate.tasks.some((card) => card.FE_PlaceholderCard)) {

@@ -61,7 +61,7 @@ function ListColumns({ boardColumns }: IProps) {
       // newProject?.boardColumns.pop() // Xóa column placeholder tạm thời
       // newProject?.columnOrderIds.pop()
       newProject?.boardColumns.push(newColumn) // Thêm column mới từ API
-      newProject?.columnOrderIds.push(newColumn.id) // Thêm columnId mới vào columnOrderIds
+      newProject?.columnOrderIds.push(newColumn.id) // Thêm boardColumnId mới vào columnOrderIds
       setCurrentActiveProject(newProject as typeof currentActiveProject)
     }).catch((error) => {
       toast.error("Có lỗi xảy ra khi tạo cột mới. Vui lòng thử lại.")
@@ -122,14 +122,14 @@ function ListColumns({ boardColumns }: IProps) {
     }
   }
 
-  // const columnIds = useMemo(() => {
+  // const boardColumnIds = useMemo(() => {
   //   return boardColumns?.map((column) => column.id)
   // }, [boardColumns])
 
-  const columnIds: UniqueIdentifier[] = boardColumns?.map((column) => column.id)
+  const boardColumnIds: UniqueIdentifier[] = boardColumns?.map((column) => column.id)
 
   return (
-    <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
+    <SortableContext items={boardColumnIds} strategy={horizontalListSortingStrategy}>
       <div className="w-full h-full flex overflow-x-auto overflow-y-hidden py-2">
         {boardColumns?.map((column) => <Column key={column.id} column={column} />)}
         {!openNewColumnForm

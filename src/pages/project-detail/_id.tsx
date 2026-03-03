@@ -43,7 +43,7 @@ function ProjectDetail() {
 
   // Khi di chuyển Card trong cùng Column
   // Chỉ cần gọi API để cập nhật mảng taskOrderIds của Column chứa nó (thay đổi vị trí trong mảng)
-  const moveCardInTheSameColumn = (dndOrderedCards: Card[] | undefined, dndOrderedCardIds: UniqueIdentifier[] | undefined, columnId: UniqueIdentifier | undefined) => {
+  const moveCardInTheSameColumn = (dndOrderedCards: Card[] | undefined, dndOrderedCardIds: UniqueIdentifier[] | undefined, boardColumnId: UniqueIdentifier | undefined) => {
     // Update cho chuẩn dữ liệu state Board
     /**
      * Cannot assign to read only property 'tasks' of object
@@ -51,7 +51,7 @@ function ProjectDetail() {
      */
     // const newBoard = { ...board }
     const newProject = cloneDeep(project)
-    const columnToUpdate = newProject?.boardColumns.find((column: Column) => column.id === columnId)
+    const columnToUpdate = newProject?.boardColumns.find((column: Column) => column.id === boardColumnId)
     if (columnToUpdate) {
       columnToUpdate.tasks = dndOrderedCards as Card[]
       columnToUpdate.taskOrderIds = dndOrderedCardIds as string[]
@@ -59,13 +59,13 @@ function ProjectDetail() {
     // setBoard(newBoard)
     setCurrentActiveProject(newProject as Project)
     // Gọi API update Column
-    updateColumnDetailsAPI(columnId as UniqueIdentifier, { taskOrderIds: dndOrderedCardIds } as Column)
+    updateColumnDetailsAPI(boardColumnId as UniqueIdentifier, { taskOrderIds: dndOrderedCardIds } as Column)
   }
 
   // Khi di chuyển Card sang Column khác:
   // B1: Cập nhật mảng taskOrderIds của Column ban đầu chứa nó (xóa id của Card ra khỏi mảng)
   // B2: Cập nhật mảng taskOrderIds của Column tiếp theo (thêm id của Card vào mảng)
-  // B3: Cập nhật lại trường columnId của Card đã kéo
+  // B3: Cập nhật lại trường boardColumnId của Card đã kéo
   const moveCardToDifferentColumn = (
     currentCardId: UniqueIdentifier | undefined,
     prevColumnId: UniqueIdentifier | undefined,

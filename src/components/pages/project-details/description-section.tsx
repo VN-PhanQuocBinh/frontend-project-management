@@ -2,28 +2,38 @@ import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DescriptionSectionProps {
+  description: string;
   className?: string;
+  isLoading?: boolean;
   onSave: (description: string) => void;
 }
 
-function DescriptionSection({ className, onSave }: DescriptionSectionProps) {
-  const [description, setDescription] = useState("");
+function DescriptionSection({
+  className,
+  description,
+  isLoading,
+  onSave,
+}: DescriptionSectionProps) {
+  const [descriptionValue, setDescription] = useState(description);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
 
   const handleSave = () => {
-    onSave(description);
+    onSave(descriptionValue);
     setIsEditingDescription(false);
   };
 
   return (
     <div className={cn("", className)}>
       <h3 className="text-sm font-medium mb-2">Mô tả</h3>
-      {isEditingDescription ? (
+      {isLoading ? (
+        <Skeleton className="w-full h-24" />
+      ) : isEditingDescription ? (
         <div>
           <Textarea
-            value={description}
+            value={descriptionValue}
             onChange={(e) => setDescription(e.target.value)}
             onBlur={() => setIsEditingDescription(false)}
             placeholder="Thêm mô tả chi tiết hơn..."
@@ -50,7 +60,7 @@ function DescriptionSection({ className, onSave }: DescriptionSectionProps) {
           className="min-h-[100px] p-3 rounded border border-input cursor-pointer hover:bg-muted/50"
           onClick={() => setIsEditingDescription(true)}
         >
-          {description || "Thêm mô tả chi tiết hơn..."}
+          {descriptionValue || "Thêm mô tả chi tiết hơn..."}
         </div>
       )}
     </div>

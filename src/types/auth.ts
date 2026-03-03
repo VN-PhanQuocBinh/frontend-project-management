@@ -5,7 +5,7 @@ export interface LoginPayload {
 
 export interface LoginResponse {
   token: string;
-  user: {
+  userData: {
     id: string;
     username: string;
     email: string;

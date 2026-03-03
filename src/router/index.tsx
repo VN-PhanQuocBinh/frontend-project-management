@@ -60,8 +60,12 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/p/:projectId",
-        element: <ProjectDetail />,
+        element: (
+          <AuthGuard>
+            <ProjectDetail />
+          </AuthGuard>
+        ),
       },
     ],
-  }
+  },
 ]);

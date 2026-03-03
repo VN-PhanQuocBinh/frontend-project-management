@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Column, Project } from "@/types/project";
+import type { Card, Column, Project } from "@/types/project";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import axiosClient from "./axios-client";
 import { useProjectStore } from "@/stores/project-store";
-import type { AxiosResponse } from "axios";
 
 // Project
 export const createProjectAPI = async (projectData: { name: string }) => {
@@ -50,12 +49,12 @@ export const moveCardToDifferentColumnAPI = async (updateData: {
 
 // Columns
 export const updateColumnDetailsAPI = async (
-  columnId: UniqueIdentifier,
+  boardColumnId: UniqueIdentifier,
   updateData: Column,
 ) => {
   // Placeholder for API call to update column details
   console.log("Gọi API update column details trong file project.api.ts");
-  axiosClient.put(`/board-columns/${columnId}`, updateData);
+  axiosClient.put(`/board-columns/${boardColumnId}`, updateData);
 };
 
 // Column
@@ -65,4 +64,22 @@ export const createNewColumnAPI = async (columnData: {
 }): Promise<Column> => {
   const createdColumn: Column = await axiosClient.post("/board-columns", columnData);
   return createdColumn;
+}
+
+export const deleteColumnAPI = async (columnId: string) => {
+  // await axiosClient.delete(`/board-columns/${columnId}`);
+}
+
+// Task
+export const createNewTaskAPI = async (taskData: {
+  title: string;
+  projectId: string;
+  boardColumnId: string;
+}): Promise<Card> => {
+  const createdTask: Card = await axiosClient.post("/tasks", taskData);
+  return createdTask;
+}
+
+export const deleteTaskAPI = async (taskId: string) => {
+  // await axiosClient.delete(`/tasks/${taskId}`);
 }

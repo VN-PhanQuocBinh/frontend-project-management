@@ -4,7 +4,7 @@ export const generatePlaceholderCard = (column: Column) => {
   return {
     id: `${column.id}-placeholder-card`,
     boardId: column.projectId,
-    columnId: column.id,
+    boardColumnId: column.id,
     FE_PlaceholderCard: true
   }
 }

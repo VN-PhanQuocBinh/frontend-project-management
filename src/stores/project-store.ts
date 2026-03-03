@@ -15,7 +15,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
       const project = state.currentActiveProject;
       if (!project) return state;
       const updatedColumns = project.boardColumns.map((column) => {
-        if (column.id === updatedCard.columnId) {
+        if (column.id === updatedCard.boardColumnId) {
           const updatedCards = column.tasks.map((card) =>
             card.id === updatedCard.id ? { ...card, ...updatedCard } : card,
           );
@@ -52,7 +52,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           }
           column.tasks = mapOrder(column.tasks, column.taskOrderIds, "id");
           column.tasks.forEach((task) => {
-            task.columnId = column.id; // Gán columnId cho mỗi task để dễ dàng truy cập sau này
+            task.boardColumnId = column.id; // Gán boardColumnId cho mỗi task để dễ dàng truy cập sau này
           });
         });
         set({ currentActiveProject: data.data as Project });

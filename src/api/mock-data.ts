@@ -17,7 +17,7 @@ export const mockData = {
           {
             id: 'card-id-01',
             projectId: 'project-id-01',
-            columnId: 'column-id-01',
+            boardColumnId: 'column-id-01',
             title: 'Title of card 01',
             description: 'Markdown Syntax (sẽ ở khóa nâng cao nhé)',
             cover: 'https://placehold.co/400x200',
@@ -25,12 +25,12 @@ export const mockData = {
             comments: ['test comment 01', 'test comment 02'],
             attachments: ['test attachment 01', 'test attachment 02', 'test attachment 03']
           },
-          { id: 'card-id-02', projectId: 'project-id-01', columnId: 'column-id-01', title: 'Title of card 02', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-03', projectId: 'project-id-01', columnId: 'column-id-01', title: 'Title of card 03', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-04', projectId: 'project-id-01', columnId: 'column-id-01', title: 'Title of card 04', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-05', projectId: 'project-id-01', columnId: 'column-id-01', title: 'Title of card 05', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-06', projectId: 'project-id-01', columnId: 'column-id-01', title: 'Title of card 06', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-07', projectId: 'project-id-01', columnId: 'column-id-01', title: 'Title of card 07', description: null, cover: null, memberIds: [], comments: [], attachments: [] }
+          { id: 'card-id-02', projectId: 'project-id-01', boardColumnId: 'column-id-01', title: 'Title of card 02', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-03', projectId: 'project-id-01', boardColumnId: 'column-id-01', title: 'Title of card 03', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-04', projectId: 'project-id-01', boardColumnId: 'column-id-01', title: 'Title of card 04', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-05', projectId: 'project-id-01', boardColumnId: 'column-id-01', title: 'Title of card 05', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-06', projectId: 'project-id-01', boardColumnId: 'column-id-01', title: 'Title of card 06', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-07', projectId: 'project-id-01', boardColumnId: 'column-id-01', title: 'Title of card 07', description: null, cover: null, memberIds: [], comments: [], attachments: [] }
         ]
       },
       {
@@ -39,9 +39,9 @@ export const mockData = {
         title: 'Inprogress Column 02',
         taskOrderIds: ['card-id-08', 'card-id-09', 'card-id-10'],
         tasks: [
-          { id: 'card-id-08', projectId: 'project-id-01', columnId: 'column-id-02', title: 'Title of card 08', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-09', projectId: 'project-id-01', columnId: 'column-id-02', title: 'Title of card 09', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-10', projectId: 'project-id-01', columnId: 'column-id-02', title: 'Title of card 10', description: null, cover: null, memberIds: [], comments: [], attachments: [] }
+          { id: 'card-id-08', projectId: 'project-id-01', boardColumnId: 'column-id-02', title: 'Title of card 08', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-09', projectId: 'project-id-01', boardColumnId: 'column-id-02', title: 'Title of card 09', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-10', projectId: 'project-id-01', boardColumnId: 'column-id-02', title: 'Title of card 10', description: null, cover: null, memberIds: [], comments: [], attachments: [] }
         ]
       },
       {
@@ -50,9 +50,9 @@ export const mockData = {
         title: 'Done Column 03',
         taskOrderIds: ['card-id-11', 'card-id-12', 'card-id-13'],
         tasks: [
-          { id: 'card-id-11', projectId: 'project-id-01', columnId: 'column-id-03', title: 'Title of card 11', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-12', projectId: 'project-id-01', columnId: 'column-id-03', title: 'Title of card 12', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
-          { id: 'card-id-13', projectId: 'project-id-01', columnId: 'column-id-03', title: 'Title of card 13', description: null, cover: null, memberIds: [], comments: [], attachments: [] }
+          { id: 'card-id-11', projectId: 'project-id-01', boardColumnId: 'column-id-03', title: 'Title of card 11', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-12', projectId: 'project-id-01', boardColumnId: 'column-id-03', title: 'Title of card 12', description: null, cover: null, memberIds: [], comments: [], attachments: [] },
+          { id: 'card-id-13', projectId: 'project-id-01', boardColumnId: 'column-id-03', title: 'Title of card 13', description: null, cover: null, memberIds: [], comments: [], attachments: [] }
         ]
       },
       {
@@ -64,7 +64,7 @@ export const mockData = {
           {
             id: 'column-id-04-placeholder-card',
             projectId: 'project-id-01',
-            columnId: 'column-id-04',
+            boardColumnId: 'column-id-04',
             FE_PlaceholderCard: true
           }
         ]

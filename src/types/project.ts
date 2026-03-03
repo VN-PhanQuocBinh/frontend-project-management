@@ -3,7 +3,7 @@ import type { UniqueIdentifier } from "@dnd-kit/core";
 export interface Card {
   id: string;
   projectId?: string;
-  columnId: string;
+  boardColumnId: string;
   title?: string;
   description?: string | null;
   cover?: string | null;

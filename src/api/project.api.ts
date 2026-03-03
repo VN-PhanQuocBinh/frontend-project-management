@@ -13,7 +13,7 @@ export const createProjectAPI = async (projectData: { name: string }) => {
   currentProjects.push(newProject);
 
   useProjectStore.getState().setProjects(currentProjects);
-}
+};
 
 export const updateProjectDetailsAPI = async (
   projectId: UniqueIdentifier,
@@ -60,15 +60,18 @@ export const updateColumnDetailsAPI = async (
 // Column
 export const createNewColumnAPI = async (columnData: {
   name: string;
-  projectId: string; 
+  projectId: string;
 }): Promise<Column> => {
-  const createdColumn: Column = await axiosClient.post("/board-columns", columnData);
+  const createdColumn: Column = await axiosClient.post(
+    "/board-columns",
+    columnData,
+  );
   return createdColumn;
-}
+};
 
 export const deleteColumnAPI = async (columnId: string) => {
-  // await axiosClient.delete(`/board-columns/${columnId}`);
-}
+  await axiosClient.delete(`/board-columns/${columnId}`);
+};
 
 // Task
 export const createNewTaskAPI = async (taskData: {
@@ -78,8 +81,8 @@ export const createNewTaskAPI = async (taskData: {
 }): Promise<Card> => {
   const createdTask: Card = await axiosClient.post("/tasks", taskData);
   return createdTask;
-}
+};
 
 export const deleteTaskAPI = async (taskId: string) => {
-  // await axiosClient.delete(`/tasks/${taskId}`);
-}
+  await axiosClient.delete(`/tasks/${taskId}`);
+};

@@ -1,22 +1,22 @@
-import { useState } from 'react'
+import { useState } from "react";
 // import { createNewCardAPI, deleteColumnDetailsAPI, updateColumnDetailsAPI } from '~/apis'
 // import {
 //   updateCurrentActiveBoard,
 //   selectCurrentActiveBoard
 // } from '~/redux/activeBoard/activeBoardSlice'
 // import { useDispatch, useSelector } from 'react-redux'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 // import ToggleFocusInput from '~/components/Form/ToggleFocusInput'
-import ListCards from './list-tasks/list-tasks'
-import type { Column as ColumnType, Card as CardType } from '@/types/project'
-import { Button } from '@/components/ui/button'
-import { CirclePlus, Ellipsis, GripVertical, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { useProjectStore } from '@/stores/project-store'
-import { toast } from 'sonner'
-import { cloneDeep } from 'lodash'
-import ToggleFocusInput from '@/components/toggle-focus-input'
+import ListCards from "./list-tasks/list-tasks";
+import type { Column as ColumnType, Card as CardType } from "@/types/project";
+import { Button } from "@/components/ui/button";
+import { CirclePlus, Ellipsis, GripVertical, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useProjectStore } from "@/stores/project-store";
+import { toast } from "sonner";
+import { cloneDeep } from "lodash";
+import ToggleFocusInput from "@/components/toggle-focus-input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,15 +25,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { createNewTaskAPI } from '@/api/project.api'
+} from "@/components/ui/dropdown-menu";
+import { createNewTaskAPI, deleteColumnAPI } from "@/api/project.api";
 
 interface IProps {
-  column: ColumnType
+  column: ColumnType;
 }
 
 function Column({ column }: IProps) {
-  const { currentActiveProject, setCurrentActiveProject } = useProjectStore()
+  const { currentActiveProject, setCurrentActiveProject } = useProjectStore();
 
   const {
     attributes,
@@ -41,29 +41,29 @@ function Column({ column }: IProps) {
     setNodeRef,
     transform,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
     id: column.id,
-    data: { ...column }
-  })
+    data: { ...column },
+  });
   // Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
   const dndKitColumnStyles = {
-    touchAction: 'none', // Dành cho pointer event dạng pointer sensor
+    touchAction: "none", // Dành cho pointer event dạng pointer sensor
     transform: CSS.Translate.toString(transform),
     transition,
     // Chiều cao phải luôn 100% vì nếu không sẽ lỗi lúc kéo column, kết hợp với {...listeners} ở Box chứ không phải div
-    height: '100%',
-    opacity: isDragging ? '0.5' : undefined
-  }
+    height: "100%",
+    opacity: isDragging ? "0.5" : undefined,
+  };
 
-  const orderedCards: CardType[] = column.tasks
-  const [openNewCardForm, setOpenNewCardForm] = useState(false)
+  const orderedCards: CardType[] = column.tasks;
+  const [openNewCardForm, setOpenNewCardForm] = useState(false);
   const toggleOpenNewCardForm = () => {
-    setOpenNewCardForm(!openNewCardForm)
-    setNewCardTitle('')
-  }
+    setOpenNewCardForm(!openNewCardForm);
+    setNewCardTitle("");
+  };
 
-  const [newCardTitle, setNewCardTitle] = useState('')
+  const [newCardTitle, setNewCardTitle] = useState("");
 
   // const handleKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
   //   if (event.key === 'Enter' && !event.shiftKey) {
@@ -77,9 +77,9 @@ function Column({ column }: IProps) {
   const addNewCard = async () => {
     if (!newCardTitle) {
       toast("Vui lòng nhập tên thẻ", {
-          description: "Không thể tạo thẻ với tên trống.",
-        })
-      return
+        description: "Không thể tạo thẻ với tên trống.",
+      });
+      return;
     }
     // const newCardData = {
     //   title: newCardTitle,
@@ -92,13 +92,13 @@ function Column({ column }: IProps) {
     //   boardId: board.id
     // })
 
-    console.log('Gọi API tạo mới card với title:', newCardTitle)
+    console.log("Gọi API tạo mới card với title:", newCardTitle);
 
     const createdCard: CardType = await createNewTaskAPI({
       title: newCardTitle,
       projectId: currentActiveProject?.id as string,
-      boardColumnId: column.id
-    })
+      boardColumnId: column.id,
+    });
 
     // const createdCard: CardType = {
     //   id: `card-${Date.now()}`,
@@ -113,41 +113,49 @@ function Column({ column }: IProps) {
     // tự làm lại state Board thay vì gọi lại fetchBoardAPI
     // const newBoard = { ...board }
     // Tương tự createNewColumn, chỗ này phải dùng deep copy (cloneDeep)
-    const newProject = cloneDeep(currentActiveProject)
-    const columnToUpdate = newProject?.boardColumns.find((column) => column.id === createdCard.boardColumnId)
+    const newProject = cloneDeep(currentActiveProject);
+    const columnToUpdate = newProject?.boardColumns.find(
+      (column) => column.id === createdCard.boardColumnId,
+    );
     if (columnToUpdate) {
       // Trường hợp mảng tasks rỗng
       if (columnToUpdate.tasks.some((card) => card.FE_PlaceholderCard)) {
-        columnToUpdate.tasks = [createdCard]
-        columnToUpdate.taskOrderIds = [createdCard.id]
+        columnToUpdate.tasks = [createdCard];
+        columnToUpdate.taskOrderIds = [createdCard.id];
       } else {
         // Ngược lại
-        columnToUpdate.tasks.push(createdCard)
-        columnToUpdate.taskOrderIds.push(createdCard.id)
+        columnToUpdate.tasks.push(createdCard);
+        columnToUpdate.taskOrderIds.push(createdCard.id);
       }
     }
     // // setBoard(newBoard)
     // dispatch(updateCurrentActiveBoard(newBoard))
-    setCurrentActiveProject(newProject as typeof currentActiveProject)
+    setCurrentActiveProject(newProject as typeof currentActiveProject);
 
-    toggleOpenNewCardForm()
-    setNewCardTitle('')
-  }
+    toggleOpenNewCardForm();
+    setNewCardTitle("");
+  };
 
   // Xử lý xóa Column và Cards bên trong nó
   const handleDeleteColumn = () => {
-      const newProject = { ...currentActiveProject }
-      // Không vi phạm Immutability của Redux
-      newProject.boardColumns = newProject?.boardColumns?.filter((c) => c.id !== column.id)
-      newProject.columnOrderIds = newProject?.columnOrderIds?.filter((id) => id !== column.id)
-      // setBoard(newBoard)
-      setCurrentActiveProject(newProject as typeof currentActiveProject)
-      // Gọi API
-      console.log('Gọi API xóa column với id:', column.id)
-  }
+    const newProject = { ...currentActiveProject };
+    // Không vi phạm Immutability của Redux
+    newProject.boardColumns = newProject?.boardColumns?.filter(
+      (c) => c.id !== column.id,
+    );
+    newProject.columnOrderIds = newProject?.columnOrderIds?.filter(
+      (id) => id !== column.id,
+    );
+    // setBoard(newBoard)
+    setCurrentActiveProject(newProject as typeof currentActiveProject);
+    // Gọi API
+    console.log("Gọi API xóa column với id:", column.id);
+
+    deleteColumnAPI(column.id);
+  };
 
   const onUpdateColumnTitle = (newTitle: string) => {
-    console.log('New title:', newTitle)
+    console.log("New title:", newTitle);
     // Gọi API update column và xử lý dữ liệu board trong Redux
     // updateColumnDetailsAPI(column.id, { title: newTitle }).then(() => {
     //   const newBoard = cloneDeep(board)
@@ -156,21 +164,20 @@ function Column({ column }: IProps) {
     //   // setBoard(newBoard)
     //   dispatch(updateCurrentActiveBoard(newBoard))
     // })
-  }
+  };
 
   // Bọc Box ở trong thẻ div và set chiếu cao div là 100% để kéo không bị bug
   return (
     <div ref={setNodeRef} style={dndKitColumnStyles}>
       <div
         {...attributes}
-        
         className="min-w-68 max-w-68 ml-2 pr-1 rounded-md h-fit bg-column"
       >
-        <div
-          className="p-2 flex items-center justify-between min-h-8"
-        >
-          <ToggleFocusInput value={column?.name}
-            onChangedValue={onUpdateColumnTitle} />
+        <div className="p-2 flex items-center justify-between min-h-8">
+          <ToggleFocusInput
+            value={column?.name}
+            onChangedValue={onUpdateColumnTitle}
+          />
           <div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -189,45 +196,35 @@ function Column({ column }: IProps) {
           </div>
         </div>
         <ListCards tasks={orderedCards} />
-        <div
-          className="p-2 min-h-8"
-        >
+        <div className="p-2 min-h-8">
           {!openNewCardForm ? (
-            <div
-              className="h-full flex items-center justify-between"
-            >
-              <Button
-                onClick={toggleOpenNewCardForm}
-                variant="ghost"
-              >
+            <div className="h-full flex items-center justify-between">
+              <Button onClick={toggleOpenNewCardForm} variant="ghost">
                 <CirclePlus />
                 Add new card
               </Button>
               {/* <Tooltip title="Drag to move">
                 <DragIndicatorIcon sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }} />
               </Tooltip> */}
-              <GripVertical className='cursor-grab' {...listeners} />
+              <GripVertical className="cursor-grab" {...listeners} />
             </div>
           ) : (
-            <div
-              className="h-full flex items-center gap-1"
-            >
-              <Input autoFocus value={newCardTitle} onChange={(e) => setNewCardTitle(e.target.value)} />
+            <div className="h-full flex items-center gap-1">
+              <Input
+                autoFocus
+                value={newCardTitle}
+                onChange={(e) => setNewCardTitle(e.target.value)}
+              />
               <div className="flex items-center gap-1">
-                <Button onClick={addNewCard}>
-                  Add
-                </Button>
-                <X
-                  onClick={toggleOpenNewCardForm}
-                  className='cursor-pointer'
-                />
+                <Button onClick={addNewCard}>Add</Button>
+                <X onClick={toggleOpenNewCardForm} className="cursor-pointer" />
               </div>
             </div>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Column
+export default Column;

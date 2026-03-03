@@ -1,8 +1,8 @@
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 // import { useDispatch } from 'react-redux'
 // import { updateCurrentActiveCard, showModalActiveCard } from '~/redux/activeCard/activeCardSlice'
-import type { Card as CardType, Project } from '@/types/project'
+import type { Card as CardType, Project } from "@/types/project";
 import {
   Card,
   // CardContent,
@@ -10,19 +10,26 @@ import {
   // CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { cn } from '@/lib/utils'
-import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
-import { useProjectStore } from '@/stores/project-store'
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { useProjectStore } from "@/stores/project-store";
+import { deleteTaskAPI } from "@/api/project.api";
 
 interface IProps {
-  card: CardType
-  onClick?: (cardId: string) => void
+  card: CardType;
+  onClick?: (cardId: string) => void;
 }
 
 function CardItem({ card, onClick }: IProps) {
   // const dispatch = useDispatch()
-  const { currentActiveProject, setCurrentActiveProject } = useProjectStore()
+  const { currentActiveProject, setCurrentActiveProject } = useProjectStore();
 
   const {
     attributes,
@@ -30,31 +37,39 @@ function CardItem({ card, onClick }: IProps) {
     setNodeRef,
     transform,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({
     id: card.id,
-    data: { ...card }
-  })
+    data: { ...card },
+  });
   // Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
   const dndKitCardStyles = {
-    touchAction: 'none', // Dành cho pointer event dạng pointer sensor
+    touchAction: "none", // Dành cho pointer event dạng pointer sensor
     transform: CSS.Translate.toString(transform),
     transition,
-    opacity: isDragging ? '0.5' : undefined,
-    border: isDragging ? '1px solid #2ecc71' : undefined
-  }
+    opacity: isDragging ? "0.5" : undefined,
+    border: isDragging ? "1px solid #2ecc71" : undefined,
+  };
 
   const handleDeleteTask = () => {
-    const currentProject = { ...currentActiveProject }
-    if (!currentProject) return
-    const targetColumn = currentProject?.boardColumns?.find(column => column.id === card.boardColumnId)
-    if (!targetColumn) return
-    targetColumn.taskOrderIds = targetColumn.taskOrderIds.filter(id => id !== card.id)
-    targetColumn.tasks = targetColumn.tasks.filter(task => task.id !== card.id)
-    setCurrentActiveProject(currentProject as Project)
+    const currentProject = { ...currentActiveProject };
+    if (!currentProject) return;
+    const targetColumn = currentProject?.boardColumns?.find(
+      (column) => column.id === card.boardColumnId,
+    );
+    if (!targetColumn) return;
+    targetColumn.taskOrderIds = targetColumn.taskOrderIds.filter(
+      (id) => id !== card.id,
+    );
+    targetColumn.tasks = targetColumn.tasks.filter(
+      (task) => task.id !== card.id,
+    );
+    setCurrentActiveProject(currentProject as Project);
 
-    console.log("Gọi API xóa task với ID: ", card.id)
-  }
+    console.log("Gọi API xóa task với ID: ", card.id);
+
+    deleteTaskAPI(card.id);
+  };
 
   // const shouldShowCardActions =
   // !!card?.memberIds?.length ||
@@ -64,7 +79,6 @@ function CardItem({ card, onClick }: IProps) {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-
         <Card
           ref={setNodeRef}
           style={dndKitCardStyles}
@@ -72,12 +86,14 @@ function CardItem({ card, onClick }: IProps) {
           {...listeners}
           onClick={() => onClick?.(card.id)}
           className={cn(
-            card?.FE_PlaceholderCard ? 'hidden' : 'block',
-            'cursor-pointer hover:shadow-md transition-shadow rounded-lg p-0'
+            card?.FE_PlaceholderCard ? "hidden" : "block",
+            "cursor-pointer hover:shadow-md transition-shadow rounded-lg p-0",
           )}
         >
           <CardHeader className="p-3 gap-0">
-            <CardTitle className="text-sm font-normal leading-5">{card.title}</CardTitle>
+            <CardTitle className="text-sm font-normal leading-5">
+              {card.title}
+            </CardTitle>
           </CardHeader>
           {/* {shouldShowCardActions && (
             <CardFooter className="p-3 pt-0">
@@ -90,11 +106,13 @@ function CardItem({ card, onClick }: IProps) {
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuGroup>
-          <ContextMenuItem onClick={handleDeleteTask}>Xóa công việc</ContextMenuItem>
+          <ContextMenuItem onClick={handleDeleteTask}>
+            Xóa công việc
+          </ContextMenuItem>
         </ContextMenuGroup>
       </ContextMenuContent>
     </ContextMenu>
-  )
+  );
 }
 
-export default CardItem
+export default CardItem;

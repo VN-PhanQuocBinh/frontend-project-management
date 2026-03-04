@@ -2,70 +2,30 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { MessageSquareText } from "lucide-react";
-import type { Member } from "./detail-modal";
+import { MessageSquareText, LoaderCircle } from "lucide-react";
+import { type Comment } from "@/hooks/use-task-comments";
+import { Skeleton } from "@/components/ui/skeleton";
+import { createComment, updateComment, deleteComment } from "@/api/comment.api";
+import { useCallback, useRef, useState, useEffect } from "react";
+import { useAuthStore } from "@/stores/auth-store";
+import { toast } from "sonner";
+import useTaskComments from "@/hooks/use-task-comments";
+import DeleteConfirmPopup from "./delete-confirm-popup";
+import { BASE_URL } from "@/config/env-vars";
 
 interface CommentSectionProps {
+  taskId: string;
   className?: string;
 }
 
-interface Comment {
-  id: string;
-  user: Member;
-  content: string;
-  timestamp: string;
+interface CommentItemProps {
+  comment: Comment;
+  isOpeningEdit: boolean;
+  isLoading: boolean;
+  onToggleUpdateOpen?: () => void;
+  onSave: (content: string) => void;
+  onDelete: () => void;
 }
-
-const mockComments: Comment[] = [
-  {
-    id: "1",
-    user: { id: "1", name: "Alice", initials: "AL", isAdded: true },
-    content: "This is the first comment.",
-    timestamp: "2024-10-01 10:00 AM",
-  },
-  {
-    id: "2",
-    user: { id: "2", name: "Bob", initials: "BO", isAdded: true },
-    content: "This is the second comment.",
-    timestamp: "2024-10-01 10:05 AM",
-  },
-  {
-    id: "3",
-    user: { id: "3", name: "Charlie", initials: "CH", isAdded: true },
-    content: "This is the third comment.",
-    timestamp: "2024-10-01 10:10 AM",
-  },
-  {
-    id: "4",
-    user: { id: "4", name: "Diana", initials: "DI", isAdded: true },
-    content: "This is the fourth comment.",
-    timestamp: "2024-10-01 10:15 AM",
-  },
-  {
-    id: "5",
-    user: { id: "5", name: "Ethan", initials: "ET", isAdded: true },
-    content: "This is the fifth comment.",
-    timestamp: "2024-10-01 10:20 AM",
-  },
-  {
-    id: "6",
-    user: { id: "6", name: "Fiona", initials: "FI", isAdded: true },
-    content: "This is the sixth comment.",
-    timestamp: "2024-10-01 10:25 AM",
-  },
-  {
-    id: "7",
-    user: { id: "7", name: "George", initials: "GE", isAdded: true },
-    content: "This is the seventh comment.",
-    timestamp: "2024-10-01 10:30 AM",
-  },
-  {
-    id: "8",
-    user: { id: "8", name: "Hannah", initials: "HA", isAdded: true },
-    content: "This is the eighth comment.",
-    timestamp: "2024-10-01 10:35 AM",
-  },
-];
 
 const avatarColors = [
   {
@@ -94,52 +54,286 @@ const avatarColors = [
   },
 ];
 
-function CommentItem({ comment }: { comment: Comment }) {
+function CommentItem({
+  comment,
+  isOpeningEdit,
+  isLoading,
+  onToggleUpdateOpen,
+  onSave,
+  onDelete,
+}: CommentItemProps) {
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [editedContent, setEditedContent] = useState(comment.content);
+
+  useEffect(() => {
+    if (isOpeningEdit && inputRef.current) {
+      const textarea = inputRef.current;
+      const length = textarea.value.length;
+
+      // Set focus
+      textarea.focus();
+
+      // Đặt cursor ở cuối
+      textarea.setSelectionRange(length, length);
+    }
+  }, [isOpeningEdit]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / 60000);
+    const diffInHours = Math.floor(diffInMs / 3600000);
+    const diffInDays = Math.floor(diffInMs / 86400000);
+
+    if (diffInMinutes < 1) return "Just now";
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+
+    return date.toLocaleDateString();
+  };
+
+  const handleOpenEditMode = () => {
+    setEditedContent(comment.content);
+    onToggleUpdateOpen?.();
+
+    inputRef.current?.focus();
+  };
+
+  const avatarColor = avatarColors[comment.userId.charCodeAt(0) % avatarColors.length];
+
   return (
-    <div key={comment.id} className="mb-4 flex">
+    <div className="mb-4 flex">
       <div>
         <Avatar className="size-8">
-          <AvatarImage src={comment.user.avatar} className="" />
-          <AvatarFallback
-            className={cn(avatarColors[mockComments.indexOf(comment) % avatarColors.length].bg)}
-          >
-            <span
-              className={cn(avatarColors[mockComments.indexOf(comment) % avatarColors.length].text)}
-            >
-              {comment.user.initials}
-            </span>
+          <AvatarImage src={comment.userId} className="" />
+          <AvatarFallback className={cn(avatarColor.bg, avatarColor.text)}>
+            <span className={cn("text-white")}>{comment.username[0].toUpperCase()}</span>
           </AvatarFallback>
         </Avatar>
       </div>
-      <div className="ml-3 space-y-1 w-full">
+      <div className="ml-2 space-y-1 w-full">
         <div>
-          <span className="font-medium">{comment.user.name}</span>
-          <span className="ml-2 text-xs text-gray-500">{comment.timestamp}</span>
+          <span className="font-medium">{comment.username}</span>
+          <span className="ml-2 text-xs text-gray-500">{formatDate(comment.createdDate)}</span>
         </div>
 
-        <div className="rounded-sm bg-white shadow px-3 py-2 w-full">
-          <p className=" text-sm">{comment.content}</p>
-        </div>
+        {isOpeningEdit ? (
+          <div className="space-y-2">
+            <Textarea
+              className="min-h-[80px]"
+              ref={inputRef}
+              autoFocus
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+            />
+            <div className="flex flex-row justify-start gap-2">
+              <Button
+                size="sm"
+                className="rounded-sm min-w-16"
+                onClick={() => onSave(editedContent)}
+              >
+                {isLoading ? <LoaderCircle className="animate-spin" /> : "Lưu"}
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="rounded-sm"
+                onClick={onToggleUpdateOpen}
+              >
+                Hủy bỏ thay đổi
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="">
+            <div className="rounded-sm bg-white shadow px-3 py-2 w-full">
+              <p className=" text-sm">{comment.content}</p>
+            </div>
+            <div className="flex flex-row gap-2 mt-2 px-2">
+              <button className="text-sm underline text-gray-500" onClick={handleOpenEditMode}>
+                Chỉnh sửa
+              </button>
+              <DeleteConfirmPopup isLoading={isLoading} onDelete={onDelete}>
+                <button className="text-sm underline text-gray-500">Xóa</button>
+              </DeleteConfirmPopup>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function CommentSection({ className }: CommentSectionProps) {
+function CommentSection({ taskId, className }: CommentSectionProps) {
+  const { user } = useAuthStore();
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [isCallingApi, setIsCallingApi] = useState(false);
+  const [isOpeningCreateComment, setIsOpeningCreateComment] = useState(false);
+  const [currentCommentValue, setCurrentCommentValue] = useState("");
+  const { comments, isLoading } = useTaskComments({
+    taskId: taskId || "",
+    wsUrl: `${BASE_URL}/ws`,
+    onCommentAdded: (comment) => {
+      console.log("New comment added:", comment);
+      // toast.success("Comment added successfully");
+    },
+    onCommentUpdated: (comment) => {
+      console.log("Comment updated:", comment);
+      // toast.success("Comment updated");
+    },
+    onCommentDeleted: (commentId) => {
+      console.log("Comment deleted:", commentId);
+      // toast.success("Comment deleted");
+    },
+  });
+  const [displayComments, setDisplayComments] = useState<Comment[]>([]);
+
+  useEffect(() => {
+    setDisplayComments([...comments].reverse());
+  }, [comments]);
+
+  const handleAddComment = useCallback(async () => {
+    setIsCallingApi(true);
+
+    try {
+      const response = await createComment({
+        content: currentCommentValue,
+        taskId,
+        userId: user?.id || "",
+      });
+
+      setDisplayComments((prev) => [response, ...prev]);
+
+      setCurrentCommentValue("");
+      setIsOpeningCreateComment(false);
+      toast.success("Comment added successfully");
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+    } finally {
+      setIsCallingApi(false);
+    }
+  }, [user, taskId, currentCommentValue]);
+
+  const handleToggleUpdateOpen = (commentId: string) => {
+    setEditingId((prev) => (prev === commentId ? null : commentId));
+  };
+
+  const toggleCreateComment = () => {
+    setEditingId(null);
+    setIsOpeningCreateComment((prev) => !prev);
+  };
+
+  const handleEditComment = useCallback(
+    async (content: string) => {
+      setIsCallingApi(true);
+
+      try {
+        if (!editingId) return;
+
+        const response = await updateComment(editingId, content);
+        setDisplayComments((prev) =>
+          prev.map((comment) => (comment.id === editingId ? response : comment)),
+        );
+        toast.success("Comment updated successfully");
+      } catch (error) {
+        toast.error("Failed to update comment");
+      } finally {
+        setEditingId(null);
+        setIsCallingApi(false);
+      }
+    },
+    [editingId],
+  );
+
+  const handleDeleteComment = useCallback(async (commentId: string) => {
+    setIsCallingApi(true);
+
+    try {
+      await deleteComment(commentId);
+      setDisplayComments((prev) => prev.filter((comment) => comment.id !== commentId));
+      toast.success("Comment deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete comment");
+    } finally {
+      setIsCallingApi(false);
+    }
+  }, []);
+
   return (
     <div className={cn("flex-1 bg-neutral-50 flex flex-col p-6 overflow-y-auto", className)}>
       <h3 className="text-lg font-semibold mb-4">
         <MessageSquareText className="inline-block mr-2 mb-1 h-5 w-5 text-gray-600" />
         <span>Nhận xét và hoạt động</span>
       </h3>
-      <div className="space-y-4">
-        <Textarea placeholder="Viết bình luận..." className="min-h-[80px] max-h-36 bg-white border border-gray-300" />
-        <Button className="">Gửi</Button>
+
+      <div className="space-y-2 border-b border-gray-300 pb-4">
+        {isOpeningCreateComment ? (
+          <>
+            <Textarea
+              ref={inputRef}
+              value={currentCommentValue}
+              placeholder="Viết bình luận..."
+              className="min-h-[80px] max-h-36 bg-white border border-gray-300 disabled:opacity-50"
+              disabled={isLoading}
+              onChange={(e) => setCurrentCommentValue(e.target.value)}
+            />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                className="min-w-16 rounded-sm"
+                disabled={isLoading || currentCommentValue.trim() === ""}
+                onClick={handleAddComment}
+              >
+                {isCallingApi ? <LoaderCircle className="animate-spin" /> : "Thêm"}
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="min-w-16 rounded-sm"
+                disabled={isLoading}
+                onClick={toggleCreateComment}
+              >
+                Hủy bỏ
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div
+            onClick={toggleCreateComment}
+            className="rounded-sm bg-white shadow px-3 py-2 w-full cursor-pointer"
+          >
+            <p className=" text-sm">Viết bình luận...</p>
+          </div>
+        )}
       </div>
-      <div className="mt-6 overflow-y-auto custom-scrollbar pr-3">
-        {mockComments.map((comment) => (
-          <CommentItem key={comment.id} comment={comment} />
-        ))}
+      <div className="pt-4 overflow-y-auto custom-scrollbar pr-3">
+        {isLoading ? (
+          <>
+            <Skeleton className="w-full h-16 mb-4" />
+            <Skeleton className="w-full h-16 mb-4" />
+            <Skeleton className="w-full h-16 mb-4" />
+          </>
+        ) : displayComments.length === 0 ? (
+          <div className="text-center text-gray-500 mt-10">
+            <MessageSquareText className="inline-block mb-2 h-8 w-8 text-gray-400" />
+            <p className="text-sm">Chưa có nhận xét nào</p>
+          </div>
+        ) : (
+          displayComments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              isOpeningEdit={editingId === comment.id}
+              isLoading={isCallingApi}
+              onToggleUpdateOpen={() => handleToggleUpdateOpen(comment.id)}
+              onSave={handleEditComment}
+              onDelete={() => handleDeleteComment(comment.id)}
+            />
+          ))
+        )}
       </div>
     </div>
   );

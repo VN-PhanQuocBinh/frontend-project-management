@@ -40,10 +40,10 @@ export default function LoginPage() {
       localStorage.setItem("access_token", response.token);
 
       // Save to store
-      login(response.user, response.token);
+      login(response.userData, response.token);
 
       toast.success("Đăng nhập thành công!", {
-        description: `Chào mừng ${response.user.username}!`,
+        description: `Chào mừng ${response.userData.username}!`,
         duration: 4000,
       });
 
@@ -68,9 +68,7 @@ export default function LoginPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-lg mb-4">
                 <span className="text-2xl font-bold">T</span>
               </div>
-              <h1 className="text-2xl! font-bold text-gray-900 mb-2">
-                Đăng nhập vào Trucllo
-              </h1>
+              <h1 className="text-2xl! font-bold text-gray-900 mb-2">Đăng nhập vào Trucllo</h1>
               <p className="text-gray-600">Chào mừng bạn quay trở lại!</p>
             </div>
 
@@ -92,9 +90,7 @@ export default function LoginPage() {
                       />
                     </div>
                     {errors.username && (
-                      <p className="text-sm text-red-600 mt-1">
-                        {errors.username.message}
-                      </p>
+                      <p className="text-sm text-red-600 mt-1">{errors.username.message}</p>
                     )}
                   </Field>
 
@@ -131,9 +127,7 @@ export default function LoginPage() {
                       </button>
                     </div>
                     {errors.password && (
-                      <p className="text-sm text-red-600 mt-1">
-                        {errors.password.message}
-                      </p>
+                      <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
                     )}
                   </Field>
 
@@ -145,9 +139,7 @@ export default function LoginPage() {
                       disabled={isSubmitting || isLoading}
                       className="w-full"
                     >
-                      {isSubmitting || isLoading
-                        ? "Đang đăng nhập..."
-                        : "Đăng nhập"}
+                      {isSubmitting || isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                     </Button>
                   </Field>
                 </FieldGroup>

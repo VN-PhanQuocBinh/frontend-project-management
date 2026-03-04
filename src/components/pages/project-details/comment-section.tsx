@@ -13,6 +13,8 @@ import useTaskComments from "@/hooks/use-task-comments";
 import DeleteConfirmPopup from "./delete-confirm-popup";
 import { BASE_URL } from "@/config/env-vars";
 
+console.log("BASE_URL in CommentSection:", BASE_URL);
+
 interface CommentSectionProps {
   taskId: string;
   className?: string;

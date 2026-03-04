@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Client, type IMessage, type StompSubscription } from "@stomp/stompjs";
 import { useAuthStore } from "@/stores/auth-store";
+import { BASE_URL } from "@/config/env-vars";
 
 interface UseWebSocketOptions {
   url: string;
@@ -28,7 +29,7 @@ function useWebSocket({
     console.log("token in useWebSocket:", token);
 
     const client = new Client({
-      brokerURL: "ws://localhost:8080/api/v1/ws/websocket",
+      brokerURL: `${BASE_URL}/ws/websocket`,
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },

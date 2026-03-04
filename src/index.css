@@ -31,7 +31,6 @@
   --secondary-foreground: oklch(0.21 0.034 264.665);
   --muted: oklch(0.967 0.003 264.542);
 
-
   --muted-foreground: oklch(0.551 0.027 264.364);
   --accent: oklch(0.967 0.003 264.542);
   --accent-foreground: oklch(0.21 0.034 264.665);
@@ -89,7 +88,7 @@ button {
   cursor: pointer;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
@@ -178,23 +177,23 @@ button {
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
   background: transparent;
   margin: 4px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
   @apply bg-gray-300;
   border-radius: 6px;
   transition: background-color 0.2s;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+*::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-400;
 }
 
 /* Firefox scrollbar */
-.custom-scrollbar {
+* {
   scrollbar-width: thin;
   scrollbar-color: rgb(209 213 219) transparent;
 }

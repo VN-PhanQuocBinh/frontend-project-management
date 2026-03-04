@@ -7,6 +7,7 @@ import Home from "@/pages/home-page";
 
 import LoginPage from "@/pages/login-page";
 import RegisterPage from "@/pages/register-page";
+import ProfilePage from "@/pages/profile-page";
 
 import { AuthGuard } from "@/components/auth-guard";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       </AuthGuard>
     ),
   },
+
   {
     element: <MainLayout />,
     children: [
@@ -36,6 +38,14 @@ export const router = createBrowserRouter([
         element: (
           <AuthGuard>
             <Home />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <AuthGuard>
+            <ProfilePage />
           </AuthGuard>
         ),
       },

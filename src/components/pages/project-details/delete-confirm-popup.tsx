@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X } from "lucide-react";
-import { createProjectAPI } from "@/api/project.api";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 
@@ -20,19 +19,8 @@ const DeleteConfirmPopup = ({
   isLoading = false,
   onDelete,
 }: DeleteConfirmPopupProps) => {
-  const [boardTitle, setBoardTitle] = useState("");
+  const [_, setBoardTitle] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (boardTitle.trim()) {
-      // Handle create board logic here
-      console.log("Creating board:", boardTitle);
-      createProjectAPI({ name: boardTitle });
-      setBoardTitle("");
-      setIsOpen(false);
-    }
-  };
 
   const handleClose = () => {
     setBoardTitle("");

@@ -94,11 +94,32 @@ function Column({ column }: IProps) {
 
     console.log("Gọi API tạo mới card với title:", newCardTitle);
 
-    const createdCard: CardType = await createNewTaskAPI({
+    createNewTaskAPI({
       title: newCardTitle,
       projectId: currentActiveProject?.id as string,
       boardColumnId: column.id,
-    });
+    }).then((createdCard: CardType) => {
+      const newProject = cloneDeep(currentActiveProject);
+      const columnToUpdate = newProject?.boardColumns.find(
+        (column) => column.id === createdCard.boardColumnId,
+      );
+      if (columnToUpdate) {
+        // Trường hợp mảng tasks rỗng
+        if (columnToUpdate.tasks.some((card) => card.FE_PlaceholderCard)) {
+          columnToUpdate.tasks = [createdCard];
+          columnToUpdate.taskOrderIds = [createdCard.id];
+        } else {
+          // Ngược lại
+          columnToUpdate.tasks.push(createdCard);
+          columnToUpdate.taskOrderIds.push(createdCard.id);
+        }
+      }
+
+      setCurrentActiveProject(newProject as typeof currentActiveProject);
+
+      toggleOpenNewCardForm();
+      setNewCardTitle("");
+    })
 
     // const createdCard: CardType = {
     //   id: `card-${Date.now()}`,
@@ -113,27 +134,6 @@ function Column({ column }: IProps) {
     // tự làm lại state Board thay vì gọi lại fetchBoardAPI
     // const newBoard = { ...board }
     // Tương tự createNewColumn, chỗ này phải dùng deep copy (cloneDeep)
-    const newProject = cloneDeep(currentActiveProject);
-    const columnToUpdate = newProject?.boardColumns.find(
-      (column) => column.id === createdCard.boardColumnId,
-    );
-    if (columnToUpdate) {
-      // Trường hợp mảng tasks rỗng
-      if (columnToUpdate.tasks.some((card) => card.FE_PlaceholderCard)) {
-        columnToUpdate.tasks = [createdCard];
-        columnToUpdate.taskOrderIds = [createdCard.id];
-      } else {
-        // Ngược lại
-        columnToUpdate.tasks.push(createdCard);
-        columnToUpdate.taskOrderIds.push(createdCard.id);
-      }
-    }
-    // // setBoard(newBoard)
-    // dispatch(updateCurrentActiveBoard(newBoard))
-    setCurrentActiveProject(newProject as typeof currentActiveProject);
-
-    toggleOpenNewCardForm();
-    setNewCardTitle("");
   };
 
   // Xử lý xóa Column và Cards bên trong nó

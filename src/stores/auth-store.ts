@@ -30,9 +30,9 @@ export const useAuthStore = create<AuthStore>()(
         });
       },
 
-      register: (user: User, token: string | null) => {
+      register: (username: User, token: string | null) => {
         set({
-          user,
+          user: username,
           token,
           isAuthenticated: true,
           isLoading: false,
@@ -55,7 +55,7 @@ export const useAuthStore = create<AuthStore>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
-        isAuthenticated: state.isAuthenticated,
+        isAuthenticated: state.isAuthenticated && state.token !== null,
       }),
     },
   ),

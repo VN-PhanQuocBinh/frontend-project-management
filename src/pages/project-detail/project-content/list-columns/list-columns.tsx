@@ -12,12 +12,13 @@ import { CirclePlus, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { generatePlaceholderCard } from '@/utils/formatters'
 import { cloneDeep } from 'lodash'
+import { createNewColumnAPI } from '@/api/project.api'
 
 interface IProps {
-  columns: ColumnType[]
+  boardColumns: ColumnType[]
 }
 
-function ListColumns({ columns }: IProps) {
+function ListColumns({ boardColumns }: IProps) {
   const { setCurrentActiveProject, currentActiveProject } = useProjectStore()
 
   // SortableContent yêu cầu items dạng ['id-1', 'id-2'] chứ không phải [{id: 'id-1', id: 'id-2'}]
@@ -45,20 +46,43 @@ function ListColumns({ columns }: IProps) {
     // gọi API tạo mới column và làm lại dữ liệu State Board
     // const createdColumn = await createNewColumnAPI({
     //   ...newColumnData,
-    //   boardId: board._id
+    //   boardId: board.id
     // })
 
     console.log('Gọi API tạo mới column với title:', newColumnTitle)
-    const createdColumn: ColumnType = {
-      _id: `col-${Date.now()}`,
-      title: newColumnTitle,
-      projectId: currentActiveProject?._id as string,
-      cards: [],
-      cardOrderIds: []
-    }
 
-    createdColumn.cards = [generatePlaceholderCard(createdColumn)]
-    createdColumn.cardOrderIds = [generatePlaceholderCard(createdColumn)._id]
+    createNewColumnAPI({
+      name: newColumnTitle,
+      projectId: currentActiveProject?.id as string
+    }).then((newColumn: ColumnType) => {
+      const newProject = cloneDeep(currentActiveProject)
+      newColumn.tasks = [generatePlaceholderCard(newColumn)]
+      newColumn.taskOrderIds = [generatePlaceholderCard(newColumn).id]
+      // newProject?.boardColumns.pop() // Xóa column placeholder tạm thời
+      // newProject?.columnOrderIds.pop()
+      newProject?.boardColumns.push(newColumn) // Thêm column mới từ API
+      newProject?.columnOrderIds.push(newColumn.id) // Thêm boardColumnId mới vào columnOrderIds
+      setCurrentActiveProject(newProject as typeof currentActiveProject)
+    }).catch((error) => {
+      toast.error("Có lỗi xảy ra khi tạo cột mới. Vui lòng thử lại.")
+      console.log("Lỗi khi gọi API tạo mới column:", error)
+      // const newProject = cloneDeep(currentActiveProject)
+      // newProject?.boardColumns.pop()
+      // newProject?.columnOrderIds.pop()
+      // setCurrentActiveProject(newProject as typeof currentActiveProject)
+    })
+
+    // const createdColumn: ColumnType = {
+    //   id: `col-${Date.now()}`,
+    //   // title: newColumnTitle,
+    //   name: newColumnTitle,
+    //   projectId: currentActiveProject?.id as string,
+    //   tasks: [],
+    //   taskOrderIds: []
+    // }
+
+    // createdColumn.tasks = [generatePlaceholderCard(createdColumn)]
+    // createdColumn.taskOrderIds = [generatePlaceholderCard(createdColumn).id]
 
     // tự làm lại state Board thay vì gọi lại fetchBoardAPI
     /**
@@ -68,9 +92,9 @@ function ListColumns({ columns }: IProps) {
      * dùng tới Deep Copy/Clone toàn bộ cái Board cho dễ hiểu và code ngắn gọn
      */
     // const newBoard = { ...board }
-    const newProject = cloneDeep(currentActiveProject)
-    newProject?.columns.push(createdColumn)
-    newProject?.columnOrderIds.push(createdColumn._id)
+    // const newProject = cloneDeep(currentActiveProject)
+    // newProject?.boardColumns.push(createdColumn)
+    // newProject?.columnOrderIds.push(createdColumn.id)
 
     /**
      * Ngoài cách đó ra thì vẫn có thể dùng array.concat thay cho push như docs của Redux Toolkit ở trên vì push
@@ -78,12 +102,12 @@ function ListColumns({ columns }: IProps) {
      * một mảng mới để chúng ta gán lại giá trị nên không vấn đề gì
      */
     // const newBoard = { ...board }
-    // newBoard.columns = newBoard.columns.concat([createdColumn])
-    // newBoard.columnOrderIds = newBoard.columnOrderIds.concat([createdColumn._id])
+    // newBoard.boardColumns = newBoard.boardColumns.concat([createdColumn])
+    // newBoard.columnOrderIds = newBoard.columnOrderIds.concat([createdColumn.id])
 
     // setBoard(newBoard)
     // Cập nhật dữ liệu trong Redux (Redux store)
-    setCurrentActiveProject(newProject as typeof currentActiveProject)
+    // setCurrentActiveProject(newProject as typeof currentActiveProject)
 
     toggleOpenNewColumnForm()
     setNewColumnTitle('')
@@ -98,16 +122,16 @@ function ListColumns({ columns }: IProps) {
     }
   }
 
-  // const columnIds = useMemo(() => {
-  //   return columns?.map((column) => column._id)
-  // }, [columns])
+  // const boardColumnIds = useMemo(() => {
+  //   return boardColumns?.map((column) => column.id)
+  // }, [boardColumns])
 
-  const columnIds: UniqueIdentifier[] = columns?.map((column) => column._id)
+  const boardColumnIds: UniqueIdentifier[] = boardColumns?.map((column) => column.id)
 
   return (
-    <SortableContext items={columnIds} strategy={horizontalListSortingStrategy}>
+    <SortableContext items={boardColumnIds} strategy={horizontalListSortingStrategy}>
       <div className="w-full h-full flex overflow-x-auto overflow-y-hidden py-2">
-        {columns?.map((column) => <Column key={column._id} column={column} />)}
+        {boardColumns?.map((column) => <Column key={column.id} column={column} />)}
         {!openNewColumnForm
           ? <div className="w-60 min-w-60 mx-2 h-fit">
             

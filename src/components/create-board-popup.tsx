@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X } from "lucide-react";
+import { createProjectAPI } from "@/api/project.api";
 
 interface CreateBoardPopupProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ const CreateBoardPopup = ({ children, align = "end", side = "bottom" }: CreateBo
     if (boardTitle.trim()) {
       // Handle create board logic here
       console.log("Creating board:", boardTitle);
+      createProjectAPI({ name: boardTitle });
       setBoardTitle("");
       setIsOpen(false);
     }

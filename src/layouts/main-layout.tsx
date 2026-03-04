@@ -7,7 +7,7 @@ import RightSidebar from "@/components/layouts/right-sidebar";
 export default function MainLayout() {
   return (
     <div className="h-full w-full overflow-hidden flex flex-col">
-      <Toaster />
+      <Toaster richColors />
       <Header />
       <main className="grow flex flex-row max-h-full w-full">
         <LeftSidebar />

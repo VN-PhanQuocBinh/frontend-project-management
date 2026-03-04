@@ -2,12 +2,15 @@ import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ExternalLink, LogOut } from "lucide-react";
 import { Tooltip } from "./ui/tooltip";
+import { useAuthStore } from "@/stores/auth-store";
 
 interface ProfilePopupProps {
   children: React.ReactNode;
 }
 
 const ProfilePopup = ({ children }: ProfilePopupProps) => {
+  const { logout } = useAuthStore();
+
   return (
     <Popover>
       <Tooltip content="Tài khoản">
@@ -45,7 +48,10 @@ const ProfilePopup = ({ children }: ProfilePopupProps) => {
 
         {/* Logout */}
         <div className="border-t border-gray-200 py-2">
-          <button className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2">
+          <button
+            onClick={logout}
+            className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
+          >
             <LogOut className="w-4 h-4" />
             <span>Đăng xuất</span>
           </button>

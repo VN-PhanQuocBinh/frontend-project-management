@@ -1,9 +1,9 @@
 import type { UniqueIdentifier } from "@dnd-kit/core";
 
 export interface Card {
-  _id: string;
+  id: string;
   projectId?: string;
-  columnId: string;
+  boardColumnId: string;
   title?: string;
   description?: string | null;
   cover?: string | null;
@@ -14,27 +14,40 @@ export interface Card {
 }
 
 export interface Column {
-  _id: string;
+  id: string;
   projectId: string;
-  title: string;
-  cardOrderIds: string[];
-  cards: Card[];
+  // title: string;
+  name: string;
+  taskOrderIds: string[];
+  tasks: Card[];
 }
 
 export interface Project {
-  _id: string;
-  title: string;
+  id: string;
+  // title?: string;
+  name?: string;
   description: string;
   type: 'public' | 'private';
   ownerIds: string[];
   memberIds: string[];
   columnOrderIds: string[];
-  columns: Column[];
+  boardColumns: Column[];
+}
+
+export interface ProjectItem {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  members: string[] | null;
+  owner: string;
 }
 
 export interface ProjectStore {
   currentActiveProject: Project | null;
+  projects: ProjectItem[];
   setCurrentActiveProject: (project: Project | null) => void;
+  setProjects: (projects: ProjectItem[]) => void;
   updateCardInProject: (updatedCard: Card) => void;
   fetchProjectDetailsAPI: (projectId: UniqueIdentifier) => Promise<void>;
 }

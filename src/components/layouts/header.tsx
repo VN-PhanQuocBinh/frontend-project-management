@@ -4,6 +4,7 @@ import NotificationPopup from "../notification-popup";
 import SearchBar from "../search-bar";
 import CreateBoardPopup from "../create-board-popup";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 const Header = ({ className }: { className?: string }) => {
   return (
@@ -17,12 +18,14 @@ const Header = ({ className }: { className?: string }) => {
           </button>
 
           {/* Trello Logo */}
-          <div className="flex items-center gap-2">
-            <div className="bg-blue-600 text-white size-7 rounded font-bold text-sm grid place-items-center">
-              T
+          <Link to="/">
+            <div className="flex items-center gap-2">
+              <div className="bg-blue-600 text-white size-7 rounded font-bold text-sm grid place-items-center">
+                T
+              </div>
+              <span className="font-semibold text-gray-800">Trucllo</span>
             </div>
-            <span className="font-semibold text-gray-800">Trucllo</span>
-          </div>
+          </Link>
         </div>
 
         {/* Center Section - Search */}

@@ -1,5 +1,5 @@
 import { useProjectStore } from "@/stores/project-store";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import { CreditCard, ListFilter, Lock, Rocket, Slack, Star, Zap } from "lucide-react";
 
 import {
@@ -8,21 +8,19 @@ import {
   AvatarGroup,
   AvatarGroupCount,
   AvatarImage,
-} from "@/components/ui/avatar"
+} from "@/components/ui/avatar";
 
 import ProjectViews from "./project-views";
 import ProjectSharing from "./project-sharing";
 import ProjectActions from "./project-actions";
 
 function ProjectBar() {
-  const { currentActiveProject } = useProjectStore()
+  const { currentActiveProject } = useProjectStore();
 
   return (
-    <div className='h-project-bar-height bg-white/10 backdrop-blur-md border-b border-white/20 px-5 flex items-center justify-between'>
+    <div className="h-project-bar-height bg-white/10 backdrop-blur-md border-b border-white/20 px-5 flex items-center justify-between">
       <div className="flex gap-1 items-center">
-        <h3 className="font-bold">
-          {currentActiveProject?.title || 'No Project Selected'}
-        </h3>
+        <h3 className="font-bold">{currentActiveProject?.name || "No Project Selected"}</h3>
         <ProjectViews />
       </div>
       <div className="flex gap-1 items-center">
@@ -32,17 +30,11 @@ function ProjectBar() {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <Avatar>
-            <AvatarImage
-              src="https://github.com/maxleiter.png"
-              alt="@maxleiter"
-            />
+            <AvatarImage src="https://github.com/maxleiter.png" alt="@maxleiter" />
             <AvatarFallback>LR</AvatarFallback>
           </Avatar>
           <Avatar>
-            <AvatarImage
-              src="https://github.com/evilrabbit.png"
-              alt="@evilrabbit"
-            />
+            <AvatarImage src="https://github.com/evilrabbit.png" alt="@evilrabbit" />
             <AvatarFallback>ER</AvatarFallback>
           </Avatar>
           <AvatarGroupCount>+3</AvatarGroupCount>
@@ -72,7 +64,7 @@ function ProjectBar() {
         <ProjectActions />
       </div>
     </div>
-  )
+  );
 }
 
 export default ProjectBar;

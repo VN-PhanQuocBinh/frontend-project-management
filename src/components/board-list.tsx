@@ -1,23 +1,14 @@
-import { User } from "lucide-react";
+// import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface Board {
-  id: string;
-  title: string;
-  createdBy: {
-    name: string;
-    avatar?: string;
-  };
-  color?: string;
-}
+import type { ProjectItem } from "@/types/project";
 
 interface BoardListProps {
   className?: string;
-  boards: Board[];
+  boards: ProjectItem[];
   onBoardClick?: (boardId: string) => void;
 }
 
-const BoardItem = ({ board, onClick }: { board: Board; onClick?: (boardId: string) => void }) => {
+const BoardItem = ({ board, onClick }: { board: ProjectItem; onClick?: (boardId: string) => void }) => {
   return (
     <button
       key={board.id}
@@ -26,23 +17,23 @@ const BoardItem = ({ board, onClick }: { board: Board; onClick?: (boardId: strin
     >
       {/* Title */}
       <h3 className="text-base font-semibold text-gray-900 group-hover:text-blue-800 mb-2">
-        {board.title}
+        {board.name}
       </h3>
 
       {/* Creator Info */}
       <div className="flex items-center gap-2">
-        {board.createdBy.avatar ? (
+        {/* {board.createdBy?.avatar ? (
           <img
-            src={board.createdBy.avatar}
-            alt={board.createdBy.name}
+            src={board.createdBy?.avatar}
+            alt={board.createdBy?.name}
             className="w-5 h-5 rounded-full"
           />
         ) : (
           <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
             <User className="w-3 h-3 text-gray-600" />
           </div>
-        )}
-        <span className="text-sm text-gray-600">{board.createdBy.name}</span>
+        )} */}
+        <span className="text-sm text-gray-600">{board.owner}</span>
       </div>
     </button>
   );
@@ -51,7 +42,7 @@ const BoardItem = ({ board, onClick }: { board: Board; onClick?: (boardId: strin
 const BoardList = ({ boards, className, onBoardClick }: BoardListProps) => {
   return (
     <div className={cn("space-y-3 overflow-y-auto custom-scrollbar pr-2", className)}>
-      {boards.map((board) => (
+      {boards.map((board: ProjectItem) => (
         <BoardItem key={board.id} board={board} onClick={onBoardClick} />
       ))}
     </div>

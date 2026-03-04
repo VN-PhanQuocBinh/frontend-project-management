@@ -1,17 +1,17 @@
-import Card from "./card/card";
+import Card from "./task/task";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useMemo, useState } from "react";
 import { type Card as CardType } from "@/types/project";
 import { DetailModal } from "@/components/pages/project-details/detail-modal";
 
 interface IProps {
-  cards: CardType[];
+  tasks: CardType[];
 }
 
-function ListCards({ cards }: IProps) {
+function ListCards({ tasks }: IProps) {
   const cardIds = useMemo(() => {
-    return cards.map((card) => card._id);
-  }, [cards]);
+    return tasks.map((card) => card.id);
+  }, [tasks]);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
@@ -20,14 +20,12 @@ function ListCards({ cards }: IProps) {
     setIsDetailModalOpen(true);
   };
 
-  console.log("Active Card ID:", activeCardId);
-
   return (
     <>
       <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2 overflow-x-hidden overflow-y-auto max-h-110 pt-0 pr-1 pb-2 pl-2">
-          {cards.map((card) => (
-            <Card key={card._id} card={card} onClick={handleCardClick} />
+          {tasks.map((card) => (
+            <Card key={card.id} card={card} onClick={handleCardClick} />
           ))}
         </div>
       </SortableContext>

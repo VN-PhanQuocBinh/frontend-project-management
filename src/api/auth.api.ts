@@ -17,6 +17,11 @@ export const authApi = {
     return response.data;
   },
 
+  async changePassword(payload: { oldPassword: string; newPassword: string }) {
+    const response = await axiosClient.post("/auth/change-password", payload);
+    return response.data;
+  },
+
   logout() {
     return axiosClient.post("/auth/logout");
   },

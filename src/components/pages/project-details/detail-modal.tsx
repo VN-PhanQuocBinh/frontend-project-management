@@ -50,27 +50,6 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
   const addedMembers = members.filter((m) => m.isAdded);
   const availableMembers = members.filter((m) => !m.isAdded);
 
-  console.log("Rendering DetailModal with cardId:", cardId);
-
-  const { comments, isConnected, isLoading, error } = useTaskComments({
-    taskId: cardId || "",
-    wsUrl: `${BASE_URL}/ws`,
-    onCommentAdded: (comment) => {
-      console.log("New comment added:", comment);
-      toast.success("Comment added successfully");
-    },
-    onCommentUpdated: (comment) => {
-      console.log("Comment updated:", comment);
-      toast.success("Comment updated");
-    },
-    onCommentDeleted: (commentId) => {
-      console.log("Comment deleted:", commentId);
-      toast.success("Comment deleted");
-    },
-  });
-
-  console.log("isConnected:", isConnected);
-
   useEffect(() => {
     if (cardId) {
       const fetchTask = async () => {
@@ -169,7 +148,7 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
                 )} */}
                 <DialogTitle
                   className="text-2xl cursor-pointer hover:bg-muted/50 p-2 rounded"
-                  onClick={() => !isLoading && setIsEditingTitle(true)}
+                  onClick={() => !isFetchingTask && setIsEditingTitle(true)}
                 >
                   {isFetchingTask ? (
                     <Skeleton className="w-1/2 h-10 mb-2" />
@@ -223,8 +202,6 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
             {/* Right Side - Activity */}
             <CommentSection
               taskId={task?.id || ""}
-              comments={comments}
-              isLoading={isLoading}
               className=""
             />
           </div>

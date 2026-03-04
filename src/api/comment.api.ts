@@ -18,3 +18,8 @@ export const updateComment = async (commentId: string, content: string) => {
   const response = await axiosClient.put(`/comments/${commentId}`, { content });
   return response.data;
 };
+
+export const deleteComment = async (commentId: string) => {
+  const response = await axiosClient.delete(`/comments/${commentId}`);
+  return response.data;
+};

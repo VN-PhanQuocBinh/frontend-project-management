@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import useWebSocket from "./use-web-socket";
 import type { IMessage } from "@stomp/stompjs";
 import { getCommentsByTaskId } from "@/api/comment.api";
+import { useAuthStore } from "@/stores/auth-store";
 
 export interface Comment {
   id: string;
@@ -16,14 +17,14 @@ export interface Comment {
 export type CommentEventType = "COMMENT_CREATED" | "COMMENT_UPDATED" | "COMMENT_DELETED";
 
 interface CommentEvent {
+  actorId: string;
   type: CommentEventType;
   payload: Comment;
 }
 
 interface UseTaskCommentsOptions {
   taskId: string;
-  apiUrl?: string;
-  wsUrl?: string;
+  wsUrl: string;
   onCommentAdded?: (comment: Comment) => void;
   onCommentUpdated?: (comment: Comment) => void;
   onCommentDeleted?: (commentId: string) => void;
@@ -31,7 +32,6 @@ interface UseTaskCommentsOptions {
 
 function useTaskComments({
   taskId,
-  apiUrl,
   wsUrl,
   onCommentAdded,
   onCommentUpdated,
@@ -40,9 +40,10 @@ function useTaskComments({
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuthStore();
 
   const { isConnected, subscribe } = useWebSocket({
-    url: wsUrl || "http://localhost:8080/api/v1/ws",
+    url: wsUrl,
     onConnect: () => {
       console.log("WebSocket connected, subscribing to task comments");
     },
@@ -78,7 +79,13 @@ function useTaskComments({
     const unsubscribe = subscribe(`/topic/task/${taskId}/comments`, (message: IMessage) => {
       try {
         const data = JSON.parse(message.body);
-        const { type, payload }: CommentEvent = data;
+        console.log("Received comment event:", data);
+        const { type, payload, actorId }: CommentEvent = data;
+
+        if (actorId === user?.id) {
+          console.log("Ignoring comment event from self");
+          return;
+        }
 
         switch (type) {
           case "COMMENT_CREATED":

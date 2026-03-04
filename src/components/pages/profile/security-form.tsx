@@ -6,11 +6,15 @@ import { type PasswordChangeForm } from "@/types/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
-import { Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { Lock, Eye, EyeOff } from "lucide-react";
+import { authApi } from "@/api/auth.api";
+import { toast } from "sonner";
 
 const passwordChangeSchema = z
   .object({
-    currentPassword: z.string().min(6, "Mật khẩu hiện tại phải có ít nhất 6 ký tự"),
+    currentPassword: z
+      .string()
+      .min(6, "Mật khẩu hiện tại phải có ít nhất 6 ký tự"),
     newPassword: z
       .string()
       .min(8, "Mật khẩu mới phải có ít nhất 8 ký tự")
@@ -38,8 +42,19 @@ const SecurityForm: React.FC = () => {
   });
 
   const onSubmit = async (data: PasswordChangeForm) => {
-    // TODO: gắn API đổi mật khẩu
     console.log("Password change data:", data);
+
+    try {
+      await authApi.changePassword({
+        oldPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      });
+      toast.success("Đổi mật khẩu thành công!");
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error("Đổi mật khẩu thất bại!");
+    }
+
     reset();
   };
 
@@ -60,7 +75,9 @@ const SecurityForm: React.FC = () => {
           <FieldGroup>
             {/* Current Password */}
             <Field data-invalid={!!errors.currentPassword} className="gap-1">
-              <FieldLabel htmlFor="currentPassword">Mật khẩu hiện tại</FieldLabel>
+              <FieldLabel htmlFor="currentPassword">
+                Mật khẩu hiện tại
+              </FieldLabel>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 <Input
@@ -75,11 +92,17 @@ const SecurityForm: React.FC = () => {
                   onClick={() => setShowCurrent(!showCurrent)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showCurrent ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
               {errors.currentPassword && (
-                <p className="text-sm text-red-600 mt-1">{errors.currentPassword.message}</p>
+                <p className="text-sm text-red-600 mt-1">
+                  {errors.currentPassword.message}
+                </p>
               )}
             </Field>
 
@@ -100,28 +123,41 @@ const SecurityForm: React.FC = () => {
                   onClick={() => setShowNew(!showNew)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showNew ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
               {errors.newPassword && (
-                <p className="text-sm text-red-600 mt-1">{errors.newPassword.message}</p>
+                <p className="text-sm text-red-600 mt-1">
+                  {errors.newPassword.message}
+                </p>
               )}
               {/* Password hints */}
               <ul className="mt-1.5 space-y-1">
-                {["Ít nhất 8 ký tự", "Ít nhất 1 chữ hoa (A-Z)", "Ít nhất 1 chữ số (0-9)"].map(
-                  (hint) => (
-                    <li key={hint} className="flex items-center gap-1.5 text-xs text-gray-400">
-                      <span className="w-1 h-1 rounded-full bg-gray-300 inline-block" />
-                      {hint}
-                    </li>
-                  ),
-                )}
+                {[
+                  "Ít nhất 8 ký tự",
+                  "Ít nhất 1 chữ hoa (A-Z)",
+                  "Ít nhất 1 chữ số (0-9)",
+                ].map((hint) => (
+                  <li
+                    key={hint}
+                    className="flex items-center gap-1.5 text-xs text-gray-400"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-gray-300 inline-block" />
+                    {hint}
+                  </li>
+                ))}
               </ul>
             </Field>
 
             {/* Confirm Password */}
             <Field data-invalid={!!errors.confirmPassword} className="gap-1">
-              <FieldLabel htmlFor="confirmPassword">Xác nhận mật khẩu mới</FieldLabel>
+              <FieldLabel htmlFor="confirmPassword">
+                Xác nhận mật khẩu mới
+              </FieldLabel>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 <Input
@@ -136,17 +172,28 @@ const SecurityForm: React.FC = () => {
                   onClick={() => setShowConfirm(!showConfirm)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showConfirm ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-sm text-red-600 mt-1">{errors.confirmPassword.message}</p>
+                <p className="text-sm text-red-600 mt-1">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </Field>
 
             {/* Submit */}
             <Field className="pt-2">
-              <Button variant="primary" type="submit" disabled={isSubmitting} className="w-full">
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full"
+              >
                 {isSubmitting ? "Đang lưu..." : "Cập nhật mật khẩu"}
               </Button>
             </Field>

@@ -3,7 +3,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ExternalLink, LogOut } from "lucide-react";
 import { Tooltip } from "./ui/tooltip";
 import { useAuthStore } from "@/stores/auth-store";
-import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 interface ProfilePopupProps {
@@ -11,7 +10,6 @@ interface ProfilePopupProps {
 }
 
 const ProfilePopup = ({ children }: ProfilePopupProps) => {
-  const navigate = useNavigate();
   const { logout } = useAuthStore();
 
   return (

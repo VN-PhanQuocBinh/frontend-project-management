@@ -1,6 +1,5 @@
 import React from "react";
 import { type UserProfile } from "@/types/profile";
-import { User, Mail, ShieldCheck, Hash } from "lucide-react";
 
 interface ProfileInfoProps {
   user: UserProfile;

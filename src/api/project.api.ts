@@ -3,6 +3,7 @@ import type { Card, Column, Project } from "@/types/project";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import axiosClient from "./axios-client";
 import { useProjectStore } from "@/stores/project-store";
+import type { ApiResponse } from "@/types/api-response";
 
 // Project
 export const createProjectAPI = async (projectData: { name: string }) => {
@@ -79,8 +80,8 @@ export const createNewTaskAPI = async (taskData: {
   projectId: string;
   boardColumnId: string;
 }): Promise<Card> => {
-  const createdTask: Card = await axiosClient.post("/tasks", taskData);
-  return createdTask;
+  const createdTask: ApiResponse<Card> = await axiosClient.post("/tasks", taskData);
+  return createdTask.data;
 };
 
 export const deleteTaskAPI = async (taskId: string) => {

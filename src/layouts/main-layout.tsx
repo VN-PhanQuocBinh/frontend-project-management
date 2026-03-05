@@ -9,9 +9,9 @@ export default function MainLayout() {
     <div className="h-full w-full overflow-hidden flex flex-col">
       <Toaster richColors />
       <Header />
-      <main className="grow flex flex-row max-h-full w-full">
+      <main className="grow flex flex-row max-h-full w-full overflow-hidden">
         <LeftSidebar />
-        <div className="grow h-full overflow-auto p-4">
+        <div className="grow h-full overflow-auto">
           <Outlet />
         </div>
         <RightSidebar />

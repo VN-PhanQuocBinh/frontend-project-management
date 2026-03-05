@@ -41,7 +41,7 @@ const BoardItem = ({ board, onClick }: { board: ProjectItem; onClick?: (boardId:
 
 const BoardList = ({ boards, className, onBoardClick }: BoardListProps) => {
   return (
-    <div className={cn("space-y-3 overflow-y-auto custom-scrollbar pr-2", className)}>
+    <div className={cn("space-y-3 overflow-y-auto custom-scrollbar pr-2 py-4", className)}>
       {boards.map((board: ProjectItem) => (
         <BoardItem key={board.id} board={board} onClick={onBoardClick} />
       ))}

@@ -6,7 +6,7 @@ import { MessageSquareText, LoaderCircle } from "lucide-react";
 import { type Comment } from "@/hooks/use-task-comments";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createComment, updateComment, deleteComment } from "@/api/comment.api";
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState, useEffect, useMemo } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
 import useTaskComments from "@/hooks/use-task-comments";
@@ -175,7 +175,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
   const [isCallingApi, setIsCallingApi] = useState(false);
   const [isOpeningCreateComment, setIsOpeningCreateComment] = useState(false);
   const [currentCommentValue, setCurrentCommentValue] = useState("");
-  const { comments, isLoading } = useTaskComments({
+  const { comments, isLoading, setComments } = useTaskComments({
     taskId: taskId || "",
     wsUrl: `${BASE_URL}/ws`,
     onCommentAdded: (comment) => {
@@ -191,11 +191,15 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
       // toast.success("Comment deleted");
     },
   });
-  const [displayComments, setDisplayComments] = useState<Comment[]>([]);
+  const displayComments = useMemo(() => {
+    return [...comments].reverse();
+  }, [comments]);
 
   useEffect(() => {
-    setDisplayComments([...comments].reverse());
-  }, [comments]);
+    if (isOpeningCreateComment && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpeningCreateComment]);
 
   const handleAddComment = useCallback(async () => {
     setIsCallingApi(true);
@@ -207,7 +211,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
         userId: user?.id || "",
       });
 
-      setDisplayComments((prev) => [response, ...prev]);
+      setComments((prev) => [...prev, response]);
 
       setCurrentCommentValue("");
       setIsOpeningCreateComment(false);
@@ -236,7 +240,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
         if (!editingId) return;
 
         const response = await updateComment(editingId, content);
-        setDisplayComments((prev) =>
+        setComments((prev) =>
           prev.map((comment) => (comment.id === editingId ? response : comment)),
         );
         toast.success("Comment updated successfully");
@@ -255,7 +259,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
 
     try {
       await deleteComment(commentId);
-      setDisplayComments((prev) => prev.filter((comment) => comment.id !== commentId));
+      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
       toast.success("Comment deleted successfully");
     } catch (error) {
       toast.error("Failed to delete comment");

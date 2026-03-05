@@ -57,7 +57,7 @@ function DescriptionSection({
         </div>
       ) : (
         <div
-          className="min-h-[100px] p-3 rounded border border-input cursor-pointer hover:bg-muted/50"
+          className="min-h-[100px] p-3 text-gray-400 rounded border border-input cursor-pointer hover:bg-muted/50"
           onClick={() => setIsEditingDescription(true)}
         >
           {descriptionValue || "Thêm mô tả chi tiết hơn..."}

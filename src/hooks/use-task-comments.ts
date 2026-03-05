@@ -126,6 +126,7 @@ function useTaskComments({
     isConnected,
     isLoading,
     error,
+    setComments,
     refetch: fetchComments,
   };
 }

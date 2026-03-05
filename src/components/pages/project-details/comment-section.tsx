@@ -175,21 +175,24 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
   const [isCallingApi, setIsCallingApi] = useState(false);
   const [isOpeningCreateComment, setIsOpeningCreateComment] = useState(false);
   const [currentCommentValue, setCurrentCommentValue] = useState("");
+  const handleCommentAdded = useCallback((comment: Comment) => {
+    console.log("New comment added:", comment);
+  }, []);
+
+  const handleCommentUpdated = useCallback((comment: Comment) => {
+    console.log("Comment updated:", comment);
+  }, []);
+
+  const handleCommentDeleted = useCallback((commentId: string) => {
+    console.log("Comment deleted:", commentId);
+  }, []);
+
   const { comments, isLoading, setComments } = useTaskComments({
     taskId: taskId || "",
     wsUrl: `${BASE_URL}/ws`,
-    onCommentAdded: (comment) => {
-      console.log("New comment added:", comment);
-      // toast.success("Comment added successfully");
-    },
-    onCommentUpdated: (comment) => {
-      console.log("Comment updated:", comment);
-      // toast.success("Comment updated");
-    },
-    onCommentDeleted: (commentId) => {
-      console.log("Comment deleted:", commentId);
-      // toast.success("Comment deleted");
-    },
+    onCommentAdded: handleCommentAdded,
+    onCommentUpdated: handleCommentUpdated,
+    onCommentDeleted: handleCommentDeleted,
   });
   const displayComments = useMemo(() => {
     return [...comments].reverse();

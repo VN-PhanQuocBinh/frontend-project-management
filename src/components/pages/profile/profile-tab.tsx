@@ -9,7 +9,7 @@ interface ProfileTabsProps {
   user: UserProfile;
 }
 
-const ProfileTabs: React.FC<ProfileTabsProps> = ({ user }) => {
+const ProfileTabs: React.FC<ProfileTabsProps> = () => {
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
@@ -36,7 +36,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ user }) => {
       </div>
 
       <TabsContent value="profile" className="mt-0">
-        <ProfileInfo user={user} />
+        <ProfileInfo />
       </TabsContent>
       <TabsContent value="security" className="mt-0">
         <SecurityForm />

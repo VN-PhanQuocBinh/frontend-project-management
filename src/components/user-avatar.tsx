@@ -25,7 +25,14 @@ function UserAvatar({ username, avatar, size = 32, className, ...props }: UserAv
     >
       <AvatarImage src={avatar} className="" />
       <AvatarFallback className={cn(avatarColor.bg, avatarColor.text)}>
-        <span className={cn("text-white")}>{username[0].toUpperCase()}</span>
+        <span
+          className={cn("text-white")}
+          style={{
+            fontSize: `${size / 2}px`,
+          }}
+        >
+          {username[0].toUpperCase()}
+        </span>
       </AvatarFallback>
     </Avatar>
   );

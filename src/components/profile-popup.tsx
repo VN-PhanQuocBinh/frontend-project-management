@@ -12,9 +12,10 @@ interface ProfilePopupProps {
 
 const ProfilePopup = ({ children }: ProfilePopupProps) => {
   const { logout, user } = useAuthStore();
+  const [open, setOpen] = React.useState(false);
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <Tooltip content="Tài khoản">
         <PopoverTrigger asChild>{children}</PopoverTrigger>
       </Tooltip>
@@ -27,9 +28,6 @@ const ProfilePopup = ({ children }: ProfilePopupProps) => {
         <div className="p-4 border-b border-gray-200">
           <div className="text-xs font-semibold text-gray-500 mb-3">TÀI KHOẢN</div>
           <div className="flex items-center gap-3">
-            {/* <div className="w-10 h-10 rounded-full bg-orange-500 text-white font-semibold flex items-center justify-center">
-              PB
-            </div> */}
             <UserAvatar username={user?.username || "User"} avatar={user?.avatar || ""} size={40} />
             <div>
               <div className="font-semibold text-gray-900">{user?.username}</div>
@@ -43,7 +41,7 @@ const ProfilePopup = ({ children }: ProfilePopupProps) => {
           <button className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors">
             Chuyển đổi Tài khoản
           </button>
-          <Link to="/profile">
+          <Link to="/profile" onClick={() => setOpen(false)}>
             <button className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors flex items-center justify-between">
               <span>Quản lý tài khoản</span>
               <ExternalLink className="w-4 h-4" />
@@ -54,7 +52,10 @@ const ProfilePopup = ({ children }: ProfilePopupProps) => {
         {/* Logout */}
         <div className="border-t border-gray-200 py-2">
           <button
-            onClick={logout}
+            onClick={() => {
+              logout();
+              setOpen(false);
+            }}
             className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
           >
             <LogOut className="w-4 h-4" />

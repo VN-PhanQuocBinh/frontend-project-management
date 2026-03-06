@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Card, Column, Project } from "@/types/project";
+import type { Card, Column, Project, User } from "@/types/project";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import axiosClient from "./axios-client";
 import { useProjectStore } from "@/stores/project-store";
@@ -86,4 +86,14 @@ export const createNewTaskAPI = async (taskData: {
 
 export const deleteTaskAPI = async (taskId: string) => {
   await axiosClient.delete(`/tasks/${taskId}`);
+};
+
+// Add member to project
+export const addMemberToProjectAPI = async (memberData: {
+  email: string;
+  projectId: string;
+  role: "OWNER" | "MEMBER";
+}): Promise<User> => {
+  const res = await axiosClient.post('/project-members', memberData);
+  return res.data.user as User;
 };

@@ -36,17 +36,6 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isFetchingTask, setIsFetchingTask] = useState(false);
-  const [members, setMembers] = useState<Member[]>([
-    { id: "1", name: "Bình Thái", initials: "BT", isAdded: true },
-    { id: "2", name: "Quốc Huy", initials: "QH", isAdded: true },
-    { id: "3", name: "Phan Quốc Bình", initials: "PB", isAdded: true },
-    { id: "4", name: "Nguyễn Bảo", initials: "NB", isAdded: true },
-    { id: "5", name: "Quốc An", initials: "QA", isAdded: false },
-    { id: "6", name: "Minh Tuấn", initials: "MT", isAdded: false },
-  ]);
-
-  const addedMembers = members.filter((m) => m.isAdded);
-  const availableMembers = members.filter((m) => !m.isAdded);
 
   useEffect(() => {
     if (cardId) {
@@ -67,10 +56,6 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
       fetchTask();
     }
   }, [cardId]);
-
-  const toggleMember = (memberId: string) => {
-    setMembers((prev) => prev.map((m) => (m.id === memberId ? { ...m, isAdded: !m.isAdded } : m)));
-  };
 
   const handleUpdateTask = useCallback(
     async (updatedTask: Partial<Task>) => {
@@ -173,10 +158,10 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
                 {/* Members Section */}
                 <MembersSection
                   className=""
-                  addedMembers={addedMembers}
-                  availableMembers={availableMembers}
-                  toggleMember={toggleMember}
+                  task={task}
+                  addedMembers={task?.taskAssignees || []}
                   isLoading={isFetchingTask}
+                  setTask={setTask}
                 />
 
                 {/* Deadline */}

@@ -1,4 +1,10 @@
+import type { User } from "./project";
+
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
+
+export interface TaskAssignee {
+  user: User
+}
 
 export interface Task {
   id: string;
@@ -13,4 +19,5 @@ export interface Task {
   assigneeName: string | null;
   creatorId: string;
   creatorName: string;
+  taskAssignees: TaskAssignee[];
 }

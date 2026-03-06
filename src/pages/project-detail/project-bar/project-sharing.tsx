@@ -17,13 +17,17 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { UserPlus, Link2, ChevronDown } from "lucide-react"
+import { addMemberToProjectAPI } from "@/api/project.api"
+import { useProjectStore } from "@/stores/project-store"
+import type { Project, User } from "@/types/project"
+import { toast } from "sonner"
 
 interface BoardMember {
   id: string
   name: string
   username: string
-  role: "Admin" | "Member"
-  workspaceRole: "Workspace admin" | "Workspace guest"
+  role: "Owner" | "Member"
+  workspaceRole: "Workspace Owner" | "Workspace guest"
   avatarColor: string
   avatarUrl?: string
   isCurrentUser?: boolean
@@ -44,8 +48,8 @@ const mockBoardMembers: BoardMember[] = [
     id: "2",
     name: "Phan Quốc Bình",
     username: "phanqucbinh",
-    role: "Admin",
-    workspaceRole: "Workspace admin",
+    role: "Owner",
+    workspaceRole: "Workspace Owner",
     avatarColor: "bg-green-600",
   },
   {
@@ -84,10 +88,12 @@ function getInitials(name: string): string {
 
 function ProjectSharing() {
   const [inviteEmail, setInviteEmail] = useState("")
-  const [inviteRole, setInviteRole] = useState<"Admin" | "Member">("Member")
+  const [inviteRole, setInviteRole] = useState<"Owner" | "Member">("Member")
   const [members, setMembers] = useState<BoardMember[]>(mockBoardMembers)
 
-  const handleRoleChange = (memberId: string, newRole: "Admin" | "Member") => {
+  const { currentActiveProject, setCurrentActiveProject } = useProjectStore()
+
+  const handleRoleChange = (memberId: string, newRole: "Owner" | "Member") => {
     setMembers((prev) =>
       prev.map((member) =>
         member.id === memberId ? { ...member, role: newRole } : member
@@ -95,11 +101,23 @@ function ProjectSharing() {
     )
   }
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (inviteEmail.trim()) {
       // TODO: Implement share logic
       console.log("Sharing with:", inviteEmail, "as", inviteRole)
+      const newMember: User = await addMemberToProjectAPI({
+        email: inviteEmail,
+        projectId: currentActiveProject?.id as string, // Replace with actual project ID
+        role: inviteRole.toUpperCase() as "OWNER" | "MEMBER",
+      })
+      const newProject: Project = { ...currentActiveProject } as Project
+      newProject.projectMembers.push({
+        user: newMember,
+        role: inviteRole.toUpperCase() as "OWNER" | "MEMBER",
+      })
+      setCurrentActiveProject(newProject)
       setInviteEmail("")
+      toast.success(`Thêm thành viên ${newMember.username} với vai trò ${inviteRole} thành công!`)
     }
   }
 
@@ -136,8 +154,8 @@ function ProjectSharing() {
                 <DropdownMenuItem onClick={() => setInviteRole("Member")}>
                   Member
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setInviteRole("Admin")}>
-                  Admin
+                <DropdownMenuItem onClick={() => setInviteRole("Owner")}>
+                  Owner
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -204,7 +222,7 @@ function ProjectSharing() {
                       variant="outline"
                       size="sm"
                       className="min-w-22.5 justify-between"
-                      disabled={member.role === "Admin" && member.workspaceRole === "Workspace admin"}
+                      disabled={member.role === "Owner" && member.workspaceRole === "Workspace Owner"}
                     >
                       {member.role}
                       <ChevronDown className="h-3 w-3 opacity-50" />
@@ -214,8 +232,8 @@ function ProjectSharing() {
                     <DropdownMenuItem onClick={() => handleRoleChange(member.id, "Member")}>
                       Member
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleRoleChange(member.id, "Admin")}>
-                      Admin
+                    <DropdownMenuItem onClick={() => handleRoleChange(member.id, "Owner")}>
+                      Owner
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

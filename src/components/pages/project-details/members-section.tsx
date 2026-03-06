@@ -5,50 +5,77 @@ import { PlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import type { Member } from "./detail-modal";
+import type { Task, TaskAssignee } from "@/types/task";
+import { useProjectStore } from "@/stores/project-store";
+import { addAssignee } from "@/api/task.api";
+import { useMemo } from "react";
 
 interface MembersSectionProps {
   className?: string;
-  addedMembers?: Member[];
-  availableMembers?: Member[];
+  task: Task | null;
+  addedMembers?: TaskAssignee[];
   isLoading?: boolean;
-  toggleMember: (memberId: string) => void;
+  setTask: React.Dispatch<React.SetStateAction<Task | null>>;
 }
 
-const avatarColors = [
-  {
-    bg: "bg-red-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-green-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-blue-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-yellow-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-purple-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-pink-500",
-    text: "text-white",
-  },
-];
+// const avatarColors = [
+//   {
+//     bg: "bg-red-500",
+//     text: "text-white",
+//   },
+//   {
+//     bg: "bg-green-500",
+//     text: "text-white",
+//   },
+//   {
+//     bg: "bg-blue-500",
+//     text: "text-white",
+//   },
+//   {
+//     bg: "bg-yellow-500",
+//     text: "text-white",
+//   },
+//   {
+//     bg: "bg-purple-500",
+//     text: "text-white",
+//   },
+//   {
+//     bg: "bg-pink-500",
+//     text: "text-white",
+//   },
+// ];
 
 function MembersSection({
   addedMembers = [],
-  availableMembers = [],
+  task,
   className,
   isLoading,
-  toggleMember,
+  setTask
 }: MembersSectionProps) {
+  const { currentActiveProject } = useProjectStore()
+
+  
+  const notAddedMembers = useMemo(() => {
+    return currentActiveProject?.projectMembers.filter(
+      (member) => !addedMembers.some((added) => added.user.id === member.user.id)
+    ) || [];
+  }, [addedMembers, currentActiveProject])
+
+  const handleAddAssignee = async (userId: string) => {
+    const addedUser = await addAssignee({
+      userId,
+      taskId: task?.id || "",
+      projectId: currentActiveProject?.id || "",
+    })
+    
+    setTask((prev) => {
+      if (!prev) return prev;
+      const clonedTask = { ...prev };
+      clonedTask.taskAssignees = [...(clonedTask.taskAssignees || []), { user: addedUser }];
+      return clonedTask;
+    });
+  }
+
   return (
     <div className={cn("", className)}>
       <h3 className="text-sm font-medium mb-2">Thành viên</h3>
@@ -58,19 +85,11 @@ function MembersSection({
         ) : (
           <>
             {addedMembers.map((member) => (
-              <Avatar key={member.id} className="size-8">
-                <AvatarImage src={member.avatar} className="" />
-                <AvatarFallback
-                  className={cn(
-                    avatarColors[addedMembers.indexOf(member) % avatarColors.length].bg,
-                  )}
-                >
-                  <span
-                    className={cn(
-                      avatarColors[addedMembers.indexOf(member) % avatarColors.length].text,
-                    )}
-                  >
-                    {member.initials}
+              <Avatar key={member.user.id} className="size-8">
+                <AvatarImage src={member.user.avatar || undefined} className="" />
+                <AvatarFallback>
+                  <span>
+                    {member.user.username[0].toUpperCase()}
                   </span>
                 </AvatarFallback>
               </Avatar>
@@ -86,34 +105,23 @@ function MembersSection({
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm mb-3">Thành viên có sẵn</h4>
                   <div className="space-y-1 max-h-[300px] overflow-y-auto">
-                    {availableMembers.map((member) => (
+                    {notAddedMembers.map((member) => (
                       <div
-                        key={member.id}
+                        key={member.user.id}
                         className="flex items-center justify-between p-2 hover:bg-muted rounded"
                       >
                         <div className="flex items-center gap-2">
                           <Avatar className="size-8">
-                            <AvatarImage src={member.avatar} />
-                            <AvatarFallback
-                              className={cn(
-                                avatarColors[availableMembers.indexOf(member) % avatarColors.length]
-                                  .bg,
-                              )}
-                            >
-                              <span
-                                className={cn(
-                                  avatarColors[
-                                    availableMembers.indexOf(member) % avatarColors.length
-                                  ].text,
-                                )}
-                              >
-                                {member.initials}
+                            <AvatarImage src={member.user.avatar || undefined} />
+                            <AvatarFallback>
+                              <span>
+                                {member.user.username[0].toUpperCase()}
                               </span>
                             </AvatarFallback>
                           </Avatar>
-                          <span className="text-sm">{member.name}</span>
+                          <span className="text-sm">{member.user.email}</span>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => toggleMember(member.id)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleAddAssignee(member.user.id)}>
                           <PlusIcon className="h-4 w-4" />
                         </Button>
                       </div>

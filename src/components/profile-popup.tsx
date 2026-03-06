@@ -4,13 +4,14 @@ import { ExternalLink, LogOut } from "lucide-react";
 import { Tooltip } from "./ui/tooltip";
 import { useAuthStore } from "@/stores/auth-store";
 import { Link } from "react-router-dom";
+import UserAvatar from "@/components/user-avatar";
 
 interface ProfilePopupProps {
   children: React.ReactNode;
 }
 
 const ProfilePopup = ({ children }: ProfilePopupProps) => {
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
 
   return (
     <Popover>
@@ -26,12 +27,13 @@ const ProfilePopup = ({ children }: ProfilePopupProps) => {
         <div className="p-4 border-b border-gray-200">
           <div className="text-xs font-semibold text-gray-500 mb-3">TÀI KHOẢN</div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-orange-500 text-white font-semibold flex items-center justify-center">
+            {/* <div className="w-10 h-10 rounded-full bg-orange-500 text-white font-semibold flex items-center justify-center">
               PB
-            </div>
+            </div> */}
+            <UserAvatar username={user?.username || "User"} avatar={user?.avatar || ""} size={40} />
             <div>
-              <div className="font-semibold text-gray-900">Phan Quốc Bình</div>
-              <div className="text-sm text-gray-600">binh26042005@gmail.com</div>
+              <div className="font-semibold text-gray-900">{user?.username}</div>
+              <div className="text-sm text-gray-600">{user?.email || "user@example.com"}</div>
             </div>
           </div>
         </div>

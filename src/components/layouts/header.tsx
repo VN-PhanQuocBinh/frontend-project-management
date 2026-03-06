@@ -1,12 +1,16 @@
-import {  Bell, Grid2X2 } from "lucide-react";
+import { Bell, Grid2X2 } from "lucide-react";
 import ProfilePopup from "../profile-popup";
 import NotificationPopup from "../notification-popup";
 import SearchBar from "../search-bar";
 import CreateBoardPopup from "../create-board-popup";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import UserAvatar from "@/components/user-avatar";
+import { useAuthStore } from "@/stores/auth-store";
 
 const Header = ({ className }: { className?: string }) => {
+  const { user } = useAuthStore();
+
   return (
     <header className={cn("bg-white border-b border-gray-200 px-4 py-2", className)}>
       <div className="flex items-center justify-between">
@@ -54,9 +58,12 @@ const Header = ({ className }: { className?: string }) => {
 
           {/* User Avatar */}
           <ProfilePopup>
-            <button className="w-8 h-8 rounded-full bg-orange-500 text-white font-semibold flex items-center justify-center hover:opacity-80">
-              PB
-            </button>
+            <UserAvatar
+              className="cursor-pointer"
+              username={user?.username || "User"}
+              avatar={user?.avatar || ""}
+              size={32}
+            />
           </ProfilePopup>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/layouts/header";
 import LeftSidebar from "@/components/layouts/left-sidebar";
-import RightSidebar from "@/components/layouts/right-sidebar";
+// import RightSidebar from "@/components/layouts/right-sidebar";
 
 export default function MainLayout() {
   return (
@@ -14,7 +14,7 @@ export default function MainLayout() {
         <div className="grow h-full overflow-auto">
           <Outlet />
         </div>
-        <RightSidebar />
+        {/* <RightSidebar /> */}
       </main>
     </div>
   );

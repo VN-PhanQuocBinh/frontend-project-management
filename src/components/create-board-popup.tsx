@@ -40,7 +40,7 @@ const CreateBoardPopup = ({ children, align = "end", side = "bottom" }: CreateBo
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-700 text-center flex-1">Tạo bảng</h2>
+          <h2 className="text-sm font-semibold text-gray-700 text-center flex-1">Tạo dự án</h2>
           <button onClick={handleClose} className="p-1 hover:bg-gray-100 rounded transition-colors">
             <X className="w-4 h-4 text-gray-600" />
           </button>
@@ -50,14 +50,14 @@ const CreateBoardPopup = ({ children, align = "end", side = "bottom" }: CreateBo
         <form onSubmit={handleSubmit} className="p-4">
           <div className="mb-4">
             <label htmlFor="board-title" className="block text-xs font-semibold text-gray-700 mb-2">
-              Tiêu đề bảng <span className="text-red-500">*</span>
+              Tiêu đề dự án <span className="text-red-500">*</span>
             </label>
             <input
               id="board-title"
               type="text"
               value={boardTitle}
               onChange={(e) => setBoardTitle(e.target.value)}
-              placeholder="Nhập tiêu đề bảng..."
+              placeholder="Nhập tiêu đề..."
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               autoFocus
             />
@@ -68,7 +68,7 @@ const CreateBoardPopup = ({ children, align = "end", side = "bottom" }: CreateBo
             disabled={!boardTitle.trim()}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-4 py-2 rounded font-medium text-sm transition-colors"
           >
-            Tạo bảng
+            Tạo dự án
           </button>
         </form>
       </PopoverContent>

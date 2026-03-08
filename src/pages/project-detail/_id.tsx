@@ -11,6 +11,8 @@ import { useParams } from 'react-router-dom'
 import { useProjectStore } from '@/stores/project-store'
 import type { UniqueIdentifier } from '@dnd-kit/core'
 import { cloneDeep } from 'lodash'
+import ListColumnsSkeleton from './project-content/list-columns/list-columns-skeleton'
+import ProjectBarSkeleton from './project-bar/project-bar-skeleton'
 
 function ProjectDetail() {
   const { fetchProjectDetailsAPI, setCurrentActiveProject, currentActiveProject } = useProjectStore()
@@ -106,7 +108,12 @@ function ProjectDetail() {
   }
 
   if (!project) {
-    return <div>Loading...</div>
+    return (
+      <div className='h-full'>
+        <ProjectBarSkeleton />
+        <ListColumnsSkeleton />
+      </div>
+    )
   }
 
   return (

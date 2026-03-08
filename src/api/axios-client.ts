@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth-store";
+import { toast } from "sonner";
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1",
@@ -31,6 +32,14 @@ axiosClient.interceptors.response.use(
       logout();
       window.location.href = "/login";
     }
+
+    let message = error.message || "An error occurred. Please try again.";
+    if (error.response?.data?.message) {
+      message = error.response?.data?.message
+    }
+
+    toast.error(message)
+
     return Promise.reject(error);
   },
 );

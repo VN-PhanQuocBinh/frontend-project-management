@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/utils/copy-to-clipboard";
 import { toast } from "sonner";
+import { updateUser } from "@/api/user.api";
 
 interface ProfileInfoProps {}
 
@@ -60,12 +61,13 @@ const ProfileInfo: React.FC<ProfileInfoProps> = () => {
     defaultValues: { email: user?.email || "" },
   });
 
-  const onSubmit = (data: z.infer<typeof profileSchema>) => {
+  const onSubmit = async (data: z.infer<typeof profileSchema>) => {
     setIsLoading(true);
 
     try {
       // TODO: call API update email
-      console.log("Updating email to:", data.email);
+      await updateUser(user!.id, { email: data.email });
+      toast.success("Email đã được cập nhật thành công!");
     } catch (error) {
       console.error("Error updating email:", error);
       toast.error("Cập nhật email thất bại!");

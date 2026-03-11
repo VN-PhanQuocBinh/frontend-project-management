@@ -23,7 +23,7 @@ function UserAvatar({ username, avatar, size = 32, className, ...props }: UserAv
         height: `${size}px`,
       }}
     >
-      <AvatarImage src={avatar} className="" />
+      <AvatarImage src={avatar} className="object-cover" />
       <AvatarFallback className={cn(avatarColor.bg, avatarColor.text)}>
         <span
           className={cn("text-white")}

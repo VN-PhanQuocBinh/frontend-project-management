@@ -38,7 +38,7 @@ const ProfilePopup = ({ children }: ProfilePopupProps) => {
 
         {/* Account Management */}
         <div className="py-2">
-          <button className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors">
+          <button className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors outline-none">
             Chuyển đổi Tài khoản
           </button>
           <Link to="/profile" onClick={() => setOpen(false)}>

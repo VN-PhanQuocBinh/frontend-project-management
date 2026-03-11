@@ -1,40 +1,48 @@
-
+import { use, Suspense } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth-store";
+import { authApi } from "@/api/auth.api";
+import type { User } from "@/types/auth";
+import { LoadingSpinner } from "./loading-spinner";
 
 interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;
 }
 
-export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
-  const { isAuthenticated, isLoading } = useAuthStore();
+function createUserFetchPromise() {
+  const stored = JSON.parse(localStorage.getItem("auth-storage") || "{}");
+  if (!stored?.state?.token) return null;
+
+  return authApi.getCurrentUser().then((res) => {
+    useAuthStore.getState().updateUser(res.data);
+  });
+}
+
+const userFetchPromise = createUserFetchPromise();
+
+function AuthGuardInner({ children, requireAuth = true }: AuthGuardProps) {
+  const { isAuthenticated, token, updateUser } = useAuthStore();
   const location = useLocation();
 
-  // Show loading state while checking auth
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Đang tải...</p>
-        </div>
-      </div>
-    );
-  }
+  if (userFetchPromise) use(userFetchPromise);
 
-  // If route requires auth and user is not authenticated
   if (requireAuth && !isAuthenticated) {
-    // Redirect to login, save the attempted location
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If route is for guests only (login, register) and user is authenticated
   if (!requireAuth && isAuthenticated) {
-    // Redirect to home or the location they tried to access
     const from = (location.state as any)?.from?.pathname || "/";
     return <Navigate to={from} replace />;
   }
 
   return <>{children}</>;
+}
+
+export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <AuthGuardInner requireAuth={requireAuth}>{children}</AuthGuardInner>
+    </Suspense>
+  );
 }

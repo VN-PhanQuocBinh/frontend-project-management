@@ -2,7 +2,6 @@ import { use, Suspense } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth-store";
 import { authApi } from "@/api/auth.api";
-import type { User } from "@/types/auth";
 import { LoadingSpinner } from "./loading-spinner";
 
 interface AuthGuardProps {
@@ -22,7 +21,7 @@ function createUserFetchPromise() {
 const userFetchPromise = createUserFetchPromise();
 
 function AuthGuardInner({ children, requireAuth = true }: AuthGuardProps) {
-  const { isAuthenticated, token, updateUser } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const location = useLocation();
 
   if (userFetchPromise) use(userFetchPromise);

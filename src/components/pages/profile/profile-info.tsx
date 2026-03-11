@@ -7,12 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Pencil, Copy, LoaderCircle } from "lucide-react";
+import { Pencil, Copy, LoaderCircle, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/utils/copy-to-clipboard";
 import { toast } from "sonner";
 import { updateUser } from "@/api/user.api";
+import { uploadImage } from "@/api/media";
 
 interface ProfileInfoProps {}
 
@@ -20,7 +21,6 @@ const profileSchema = z.object({
   email: z.string().email("Email không hợp lệ").optional(),
 });
 
-// Helper: màu badge theo role
 function getRoleBadgeClass(role: UserRole | undefined) {
   switch (role?.toLowerCase()) {
     case "ADMIN":
@@ -48,9 +48,12 @@ const InfoRow: React.FC<{
 );
 
 const ProfileInfo: React.FC<ProfileInfoProps> = () => {
-  const { user } = useAuthStore();
+  const { user, updateUser: updateUserStore } = useAuthStore();
   const [isOpenEditEmail, setIsOpenEditEmail] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const {
     register,
     reset,
@@ -63,10 +66,10 @@ const ProfileInfo: React.FC<ProfileInfoProps> = () => {
 
   const onSubmit = async (data: z.infer<typeof profileSchema>) => {
     setIsLoading(true);
-
     try {
-      // TODO: call API update email
-      await updateUser(user!.id, { email: data.email });
+      console.log("Updating email to:", data);
+      const newUserData = await updateUser(user!.id, { email: data.email });
+      updateUserStore(newUserData);
       toast.success("Email đã được cập nhật thành công!");
     } catch (error) {
       console.error("Error updating email:", error);
@@ -86,6 +89,36 @@ const ProfileInfo: React.FC<ProfileInfoProps> = () => {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      toast.error("Vui lòng chọn một tệp ảnh để tải lên.");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Người dùng không tồn tại.");
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const url = await uploadImage(file);
+      if (!url) throw new Error("Upload failed");
+
+      await updateUser(user.id, { avatar: url });
+
+      updateUserStore({ avatar: url });
+      toast.success("Ảnh đại diện đã được cập nhật!");
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      toast.error("Cập nhật ảnh đại diện thất bại!");
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="p-6">
       {/* Banner + Avatar */}
@@ -93,13 +126,33 @@ const ProfileInfo: React.FC<ProfileInfoProps> = () => {
         {/* Banner */}
         <div className="h-32 rounded-sm bg-gradient-to-r from-gray-300 to-gray-500" />
 
-        {/* Avatar */}
-        <div className="absolute -bottom-10 left-6">
+        {/* Avatar with upload button */}
+        <div className="absolute -bottom-10 left-6 group">
           <UserAvatar
             username={user?.username || "User"}
             avatar={user?.avatar || ""}
             size={80}
             className="border-4 border-white shadow-md"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploadingAvatar}
+            className="absolute bottom-0 right-0 flex items-center justify-center w-7 h-7 rounded-full bg-white border border-gray-200 shadow cursor-pointer hover:bg-gray-100 transition-colors"
+            title="Đổi ảnh đại diện"
+          >
+            {isUploadingAvatar ? (
+              <LoaderCircle className="w-3.5 h-3.5 animate-spin text-gray-600" />
+            ) : (
+              <Camera className="w-3.5 h-3.5 text-gray-600" />
+            )}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarUpload}
           />
         </div>
       </div>

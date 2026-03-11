@@ -60,7 +60,7 @@ const Header = ({ className }: { className?: string }) => {
           {/* User Avatar */}
           <ProfilePopup>
             <UserAvatar
-              className="cursor-pointer"
+              className="cursor-pointer border-2 border-gray-50 shadow-xl"
               username={user?.username || "User"}
               avatar={user?.avatar || ""}
               size={32}

@@ -1,125 +1,93 @@
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { UserPlus, Link2, ChevronDown } from "lucide-react"
-import { addMemberToProjectAPI } from "@/api/project.api"
-import { useProjectStore } from "@/stores/project-store"
-import type { Project, User } from "@/types/project"
-import { toast } from "sonner"
-
-interface BoardMember {
-  id: string
-  name: string
-  username: string
-  role: "Owner" | "Member"
-  workspaceRole: "Workspace Owner" | "Workspace guest"
-  avatarColor: string
-  avatarUrl?: string
-  isCurrentUser?: boolean
-}
-
-// Mock data for board members
-const mockBoardMembers: BoardMember[] = [
-  {
-    id: "1",
-    name: "Quốc Hội",
-    username: "henrylam2207",
-    role: "Member",
-    workspaceRole: "Workspace guest",
-    avatarColor: "bg-orange-500",
-    isCurrentUser: true,
-  },
-  {
-    id: "2",
-    name: "Phan Quốc Bình",
-    username: "phanqucbinh",
-    role: "Owner",
-    workspaceRole: "Workspace Owner",
-    avatarColor: "bg-green-600",
-  },
-  {
-    id: "3",
-    name: "Bình Thái",
-    username: "binhthai6",
-    role: "Member",
-    workspaceRole: "Workspace guest",
-    avatarColor: "bg-cyan-500",
-  },
-  {
-    id: "4",
-    name: "Ngo Quoc Cuong B2303801",
-    username: "ngoquoccuongb2303801",
-    role: "Member",
-    workspaceRole: "Workspace guest",
-    avatarColor: "bg-green-500",
-  },
-  {
-    id: "5",
-    name: "Quốc An",
-    username: "qucan1",
-    role: "Member",
-    workspaceRole: "Workspace guest",
-    avatarColor: "bg-amber-500",
-  },
-]
-
-function getInitials(name: string): string {
-  const words = name.split(" ")
-  if (words.length >= 2) {
-    return (words[0][0] + words[words.length - 1][0]).toUpperCase()
-  }
-  return name.substring(0, 2).toUpperCase()
-}
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { UserPlus, ChevronDown, LoaderCircle } from "lucide-react";
+import { addMemberToProjectAPI, getAllProjectMembersAPI } from "@/api/project.api";
+import { useProjectStore } from "@/stores/project-store";
+import type { Project, ProjectMember, User } from "@/types/project";
+import { toast } from "sonner";
+import { useAuthStore } from "@/stores/auth-store";
+import UserAvatar from "@/components/user-avatar";
 
 function ProjectSharing() {
-  const [inviteEmail, setInviteEmail] = useState("")
-  const [inviteRole, setInviteRole] = useState<"Owner" | "Member">("Member")
-  const [members, setMembers] = useState<BoardMember[]>(mockBoardMembers)
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"Owner" | "Member">("Member");
+  const [members, setMembers] = useState<ProjectMember[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuthStore();
 
-  const { currentActiveProject, setCurrentActiveProject } = useProjectStore()
+  const { currentActiveProject, setCurrentActiveProject } = useProjectStore();
 
-  const handleRoleChange = (memberId: string, newRole: "Owner" | "Member") => {
-    setMembers((prev) =>
-      prev.map((member) =>
-        member.id === memberId ? { ...member, role: newRole } : member
-      )
-    )
-  }
+  useEffect(() => {
+    const fetchProjectMembers = async () => {
+      setIsLoading(true);
+      try {
+        const projectMembers = await getAllProjectMembersAPI(currentActiveProject?.id as string);
+        setMembers(projectMembers);
+      } catch (error) {
+        console.error("Failed to fetch project members:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (currentActiveProject?.id) {
+      fetchProjectMembers();
+    }
+  }, []);
+
+  const handleRoleChange = (memberId: string, newRole: ProjectMember["role"]) => {
+    setMembers((prev) => {
+      return prev.map((member) =>
+        member.user.id === memberId ? { ...member, role: newRole } : member,
+      );
+    });
+  };
 
   const handleShare = async () => {
-    if (inviteEmail.trim()) {
-      // TODO: Implement share logic
-      console.log("Sharing with:", inviteEmail, "as", inviteRole)
+    if (!inviteEmail.trim()) return;
+
+    try {
       const newMember: User = await addMemberToProjectAPI({
         email: inviteEmail,
         projectId: currentActiveProject?.id as string, // Replace with actual project ID
         role: inviteRole.toUpperCase() as "OWNER" | "MEMBER",
-      })
-      const newProject: Project = { ...currentActiveProject } as Project
+      });
+
+      const newProject: Project = { ...currentActiveProject } as Project;
       newProject.projectMembers.push({
         user: newMember,
         role: inviteRole.toUpperCase() as "OWNER" | "MEMBER",
-      })
-      setCurrentActiveProject(newProject)
-      setInviteEmail("")
-      toast.success(`Thêm thành viên ${newMember.username} với vai trò ${inviteRole} thành công!`)
+      });
+
+      setCurrentActiveProject(newProject);
+      setInviteEmail("");
+      toast.success(`Thêm thành viên ${newMember.username} với vai trò ${inviteRole} thành công!`);
+    } catch (error: any) {
+      console.log(error.response.data.message);
+      setError(error?.response?.data?.message || "Failed to add member");
     }
-  }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInviteEmail(e.target.value);
+    setError(null);
+  };
 
   return (
     <Dialog>
@@ -140,33 +108,34 @@ function ProjectSharing() {
             <Input
               placeholder="Email address or name"
               value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
+              onChange={handleInputChange}
               className="flex-1"
             />
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger disabled={isLoading} asChild>
                 <Button variant="outline" className="min-w-25 justify-between">
                   {inviteRole}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setInviteRole("Member")}>
-                  Member
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setInviteRole("Owner")}>
-                  Owner
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setInviteRole("Member")}>Member</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setInviteRole("Owner")}>Owner</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button onClick={handleShare} className="bg-blue-600 hover:bg-blue-700">
-              Share
+            <Button
+              disabled={isLoading || !inviteEmail.trim()}
+              onClick={handleShare}
+              className="bg-blue-600 hover:bg-blue-700 min-w-[60px]"
+            >
+              {isLoading ? <LoaderCircle className="animate-spin" /> : "Thêm"}
             </Button>
           </div>
+          {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
         </div>
 
         {/* Share with link section */}
-        <div className="px-6 pb-4">
+        {/* <div className="px-6 pb-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
               <Link2 className="h-5 w-5 text-gray-600" />
@@ -178,7 +147,7 @@ function ProjectSharing() {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <Separator />
 
@@ -193,26 +162,21 @@ function ProjectSharing() {
 
           <div className="flex flex-col gap-3 max-h-75 overflow-y-auto">
             {members.map((member) => (
-              <div key={member.id} className="flex items-center justify-between">
+              <div key={member.user.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Avatar>
-                    {member.avatarUrl ? (
-                      <AvatarImage src={member.avatarUrl} alt={member.name} />
-                    ) : null}
-                    <AvatarFallback className={`${member.avatarColor} text-white text-xs font-medium`}>
-                      {getInitials(member.name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    username={member.user.username}
+                    avatar={member.user.avatar || ""}
+                    className="h-10 w-10"
+                  />
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">
-                      {member.name}
-                      {member.isCurrentUser && (
+                      {member.user.username}
+                      {member.user.id === user?.id && (
                         <span className="text-gray-500 font-normal"> (you)</span>
                       )}
                     </span>
-                    <span className="text-xs text-gray-500">
-                      @{member.username} • {member.workspaceRole}
-                    </span>
+                    <span className="text-xs text-gray-500">@{member.user.username}</span>
                   </div>
                 </div>
 
@@ -222,17 +186,17 @@ function ProjectSharing() {
                       variant="outline"
                       size="sm"
                       className="min-w-22.5 justify-between"
-                      disabled={member.role === "Owner" && member.workspaceRole === "Workspace Owner"}
+                      disabled={member.role === "OWNER"}
                     >
                       {member.role}
                       <ChevronDown className="h-3 w-3 opacity-50" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleRoleChange(member.id, "Member")}>
+                    <DropdownMenuItem onClick={() => handleRoleChange(member.user.id, "MEMBER")}>
                       Member
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleRoleChange(member.id, "Owner")}>
+                    <DropdownMenuItem onClick={() => handleRoleChange(member.user.id, "OWNER")}>
                       Owner
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -243,7 +207,7 @@ function ProjectSharing() {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export default ProjectSharing
+export default ProjectSharing;

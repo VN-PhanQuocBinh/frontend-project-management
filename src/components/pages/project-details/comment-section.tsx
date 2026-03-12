@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { MessageSquareText, LoaderCircle } from "lucide-react";
-import { type Comment } from "@/hooks/use-task-comments";
+import type { Comment } from "@/types/comment";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createComment, updateComment, deleteComment } from "@/api/comment.api";
 import { useCallback, useRef, useState, useEffect, useMemo } from "react";
@@ -82,11 +82,11 @@ function CommentItem({
 
   return (
     <div className="mb-4 flex">
-      <UserAvatar username={comment.username} avatar={comment.userId} size={32} />
+      <UserAvatar username={comment.user.username} avatar={comment.user.avatar} size={32} />
 
       <div className="ml-2 space-y-1 w-full">
         <div>
-          <span className="font-medium">{comment.username}</span>
+          <span className="font-medium">{comment.user.username}</span>
           <span className="ml-2 text-xs text-gray-500">{formatDate(comment.createdDate)}</span>
         </div>
 
@@ -189,7 +189,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
 
       setCurrentCommentValue("");
       setIsOpeningCreateComment(false);
-      toast.success("Comment added successfully");
+      // toast.success("Comment added successfully");
     } catch (error) {
       console.error("Failed to add comment:", error);
     } finally {
@@ -202,6 +202,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
   };
 
   const toggleCreateComment = () => {
+    setCurrentCommentValue("");
     setEditingId(null);
     setIsOpeningCreateComment((prev) => !prev);
   };
@@ -308,7 +309,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
               comment={comment}
               isOpeningEdit={editingId === comment.id}
               isLoading={isCallingApi}
-              isMyComment={comment.userId === user?.id}
+              isMyComment={comment.user.id === user?.id}
               onToggleUpdateOpen={() => handleToggleUpdateOpen(comment.id)}
               onSave={handleEditComment}
               onDelete={() => handleDeleteComment(comment.id)}

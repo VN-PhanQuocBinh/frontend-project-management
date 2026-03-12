@@ -23,13 +23,13 @@ const Header = ({ className }: { className?: string }) => {
 
           {/* Trello Logo */}
           <Link to="/">
-            {/* <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <div className="bg-blue-600 text-white size-7 rounded font-bold text-sm grid place-items-center">
                 T
               </div>
               <span className="font-semibold text-gray-800">Trucllo</span>
-            </div> */}
-            <img src="\src\assets\trucllo.png" className="h-9" />
+            </div>
+            {/* <img src="\src\assets\trucllo.png" className="h-9" /> */}
           </Link>
         </div>
 

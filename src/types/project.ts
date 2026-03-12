@@ -22,14 +22,28 @@ export interface Column {
   tasks: Card[];
 }
 
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  avatar: string | null;
+  deleted: boolean;
+  role: 'USER' | 'ADMIN';
+}
+
+export interface ProjectMember {
+  user: User,
+  role: 'OWNER' | 'MEMBER';
+}
+
 export interface Project {
   id: string;
   // title?: string;
   name?: string;
   description: string;
-  type: 'public' | 'private';
-  ownerIds: string[];
-  memberIds: string[];
+  owner: string;
+  status: 'ACTIVE' | 'ARCHIVED';
+  projectMembers: ProjectMember[];
   columnOrderIds: string[];
   boardColumns: Column[];
 }

@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { MessageSquareText, LoaderCircle } from "lucide-react";
-import { type Comment } from "@/hooks/use-task-comments";
+import type { Comment } from "@/types/comment";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createComment, updateComment, deleteComment } from "@/api/comment.api";
 import { useCallback, useRef, useState, useEffect, useMemo } from "react";
@@ -12,8 +11,7 @@ import { toast } from "sonner";
 import useTaskComments from "@/hooks/use-task-comments";
 import DeleteConfirmPopup from "./delete-confirm-popup";
 import { BASE_URL } from "@/config/env-vars";
-
-console.log("BASE_URL in CommentSection:", BASE_URL);
+import UserAvatar from "@/components/user-avatar";
 
 interface CommentSectionProps {
   taskId: string;
@@ -24,42 +22,17 @@ interface CommentItemProps {
   comment: Comment;
   isOpeningEdit: boolean;
   isLoading: boolean;
+  isMyComment: boolean;
   onToggleUpdateOpen?: () => void;
   onSave: (content: string) => void;
   onDelete: () => void;
 }
 
-const avatarColors = [
-  {
-    bg: "bg-red-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-green-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-blue-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-yellow-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-purple-500",
-    text: "text-white",
-  },
-  {
-    bg: "bg-pink-500",
-    text: "text-white",
-  },
-];
-
 function CommentItem({
   comment,
   isOpeningEdit,
   isLoading,
+  isMyComment,
   onToggleUpdateOpen,
   onSave,
   onDelete,
@@ -81,9 +54,13 @@ function CommentItem({
   }, [isOpeningEdit]);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Normalize date string to ensure it can be parsed correctly across different browsers
+    const normalized = dateString.replace(/(\.\d{3})\d+/, "$1") + "Z"; // UTC -> UTC +7
+
+    const date = new Date(normalized);
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();
+    console.log("Time difference in ms:", diffInMs);
     const diffInMinutes = Math.floor(diffInMs / 60000);
     const diffInHours = Math.floor(diffInMs / 3600000);
     const diffInDays = Math.floor(diffInMs / 86400000);
@@ -103,21 +80,13 @@ function CommentItem({
     inputRef.current?.focus();
   };
 
-  const avatarColor = avatarColors[comment.userId.charCodeAt(0) % avatarColors.length];
-
   return (
     <div className="mb-4 flex">
-      <div>
-        <Avatar className="size-8">
-          <AvatarImage src={comment.userId} className="" />
-          <AvatarFallback className={cn(avatarColor.bg, avatarColor.text)}>
-            <span className={cn("text-white")}>{comment.username[0].toUpperCase()}</span>
-          </AvatarFallback>
-        </Avatar>
-      </div>
+      <UserAvatar username={comment.user.username} avatar={comment.user.avatar} size={32} />
+
       <div className="ml-2 space-y-1 w-full">
         <div>
-          <span className="font-medium">{comment.username}</span>
+          <span className="font-medium">{comment.user.username}</span>
           <span className="ml-2 text-xs text-gray-500">{formatDate(comment.createdDate)}</span>
         </div>
 
@@ -153,14 +122,16 @@ function CommentItem({
             <div className="rounded-sm bg-white shadow px-3 py-2 w-full">
               <p className=" text-sm">{comment.content}</p>
             </div>
-            <div className="flex flex-row gap-2 mt-2 px-2">
-              <button className="text-sm underline text-gray-500" onClick={handleOpenEditMode}>
-                Chỉnh sửa
-              </button>
-              <DeleteConfirmPopup isLoading={isLoading} onDelete={onDelete}>
-                <button className="text-sm underline text-gray-500">Xóa</button>
-              </DeleteConfirmPopup>
-            </div>
+            {isMyComment && (
+              <div className="flex flex-row gap-2 mt-2 px-2">
+                <button className="text-sm underline text-gray-500" onClick={handleOpenEditMode}>
+                  Chỉnh sửa
+                </button>
+                <DeleteConfirmPopup isLoading={isLoading} onDelete={onDelete}>
+                  <button className="text-sm underline text-gray-500">Xóa</button>
+                </DeleteConfirmPopup>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -218,7 +189,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
 
       setCurrentCommentValue("");
       setIsOpeningCreateComment(false);
-      toast.success("Comment added successfully");
+      // toast.success("Comment added successfully");
     } catch (error) {
       console.error("Failed to add comment:", error);
     } finally {
@@ -231,6 +202,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
   };
 
   const toggleCreateComment = () => {
+    setCurrentCommentValue("");
     setEditingId(null);
     setIsOpeningCreateComment((prev) => !prev);
   };
@@ -337,6 +309,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
               comment={comment}
               isOpeningEdit={editingId === comment.id}
               isLoading={isCallingApi}
+              isMyComment={comment.user.id === user?.id}
               onToggleUpdateOpen={() => handleToggleUpdateOpen(comment.id)}
               onSave={handleEditComment}
               onDelete={() => handleDeleteComment(comment.id)}

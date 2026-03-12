@@ -36,17 +36,7 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isFetchingTask, setIsFetchingTask] = useState(false);
-  const [members, setMembers] = useState<Member[]>([
-    { id: "1", name: "Bình Thái", initials: "BT", isAdded: true },
-    { id: "2", name: "Quốc Huy", initials: "QH", isAdded: true },
-    { id: "3", name: "Phan Quốc Bình", initials: "PB", isAdded: true },
-    { id: "4", name: "Nguyễn Bảo", initials: "NB", isAdded: true },
-    { id: "5", name: "Quốc An", initials: "QA", isAdded: false },
-    { id: "6", name: "Minh Tuấn", initials: "MT", isAdded: false },
-  ]);
-
-  const addedMembers = members.filter((m) => m.isAdded);
-  const availableMembers = members.filter((m) => !m.isAdded);
+  const [isUpdatingTask, setIsUpdatingTask] = useState(false);
 
   useEffect(() => {
     if (cardId) {
@@ -68,12 +58,9 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
     }
   }, [cardId]);
 
-  const toggleMember = (memberId: string) => {
-    setMembers((prev) => prev.map((m) => (m.id === memberId ? { ...m, isAdded: !m.isAdded } : m)));
-  };
-
   const handleUpdateTask = useCallback(
     async (updatedTask: Partial<Task>) => {
+      setIsUpdatingTask(true);
       try {
         if (!cardId) return;
 
@@ -82,6 +69,8 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
       } catch (error) {
         console.error("Failed to update task:", error);
         toast.error("Failed to update task");
+      } finally {
+        setIsUpdatingTask(false);
       }
     },
     [cardId],
@@ -96,7 +85,7 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
         >
           <DialogHeader className="flex flex-row items-center justify-between border-b border-gray-300 p-3">
             <div className="">
-              <div className="px-3 py-1 rounded-sm bg-gray-200 font-semibold">Not started</div>
+              <div className="px-3 py-1 rounded-sm bg-gray-200 font-semibold">{task?.status}</div>
             </div>
 
             <div className="flex items-center gap-2">
@@ -121,29 +110,6 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
             {/* Left Side */}
             <div className="flex-1 p-6 overflow-y-auto border-r border-gray-200">
               <DialogHeader>
-                {/* {isFetchingTask ? (
-                  <Skeleton className="w-1/2 h-10 mb-2" />
-                ) : isEditingTitle ? (
-                  <Input
-                    value={task?.title || ""}
-                    onChange={(e) =>
-                      setTask((prev) => (prev ? { ...prev, title: e.target.value } : prev))
-                    }
-                    onBlur={(e) => {
-                      handleUpdateTask({ title: e.target.value });
-                      setIsEditingTitle(false);
-                    }}
-                    className="text-2xl font-semibold"
-                    autoFocus
-                  />
-                ) : (
-                  <DialogTitle
-                    className="text-2xl cursor-pointer hover:bg-muted/50 p-2 rounded"
-                    onClick={() => setIsEditingTitle(true)}
-                  >
-                    {task?.title || "Task Title"}
-                  </DialogTitle>
-                )} */}
                 <DialogTitle
                   className="text-2xl cursor-pointer hover:bg-muted/50 p-2 rounded"
                   onClick={() => !isFetchingTask && setIsEditingTitle(true)}
@@ -173,10 +139,10 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
                 {/* Members Section */}
                 <MembersSection
                   className=""
-                  addedMembers={addedMembers}
-                  availableMembers={availableMembers}
-                  toggleMember={toggleMember}
+                  task={task}
+                  addedMembers={task?.taskAssignees || []}
                   isLoading={isFetchingTask}
+                  setTask={setTask}
                 />
 
                 {/* Deadline */}
@@ -193,15 +159,13 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
                   description={task?.description || ""}
                   onSave={(value) => handleUpdateTask({ description: value })}
                   isLoading={isFetchingTask}
+                  isUpdating={isUpdatingTask}
                 />
               </div>
             </div>
 
             {/* Right Side - Activity */}
-            <CommentSection
-              taskId={task?.id || ""}
-              className=""
-            />
+            <CommentSection taskId={task?.id || ""} className="" />
           </div>
         </DialogContent>
       </Dialog>

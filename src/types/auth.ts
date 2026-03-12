@@ -12,11 +12,14 @@ export interface LoginResponse {
   };
 }
 
+export type UserRole = "ADMIN" | "USER";
+
 export interface User {
   id: string;
   username: string;
   email: string;
   avatar?: string;
+  role?: UserRole;
 }
 
 export interface AuthState {

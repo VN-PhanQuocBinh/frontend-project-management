@@ -22,6 +22,11 @@ export const authApi = {
     return response.data;
   },
 
+  async getCurrentUser() {
+    const response = await axiosClient.get("/auth/me");
+    return response.data;
+  },
+
   logout() {
     return axiosClient.post("/auth/logout");
   },

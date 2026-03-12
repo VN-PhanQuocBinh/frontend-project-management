@@ -3,16 +3,7 @@ import useWebSocket from "./use-web-socket";
 import type { IMessage } from "@stomp/stompjs";
 import { getCommentsByTaskId } from "@/api/comment.api";
 import { useAuthStore } from "@/stores/auth-store";
-
-export interface Comment {
-  id: string;
-  content: string;
-  createdDate: string;
-  userId: string;
-  username: string;
-  taskId: string;
-  taskTitle: string;
-}
+import type { Comment } from "@/types/comment";
 
 export type CommentEventType = "COMMENT_CREATED" | "COMMENT_UPDATED" | "COMMENT_DELETED";
 

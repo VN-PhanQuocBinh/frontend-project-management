@@ -1,27 +1,53 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoaderCircle } from "lucide-react";
 
 interface DescriptionSectionProps {
   description: string;
   className?: string;
   isLoading?: boolean;
-  onSave: (description: string) => void;
+  isUpdating?: boolean;
+  onSave: (description: string) => Promise<void>;
 }
 
 function DescriptionSection({
   className,
   description,
   isLoading,
+  isUpdating,
   onSave,
 }: DescriptionSectionProps) {
   const [descriptionValue, setDescription] = useState(description);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSave = () => {
-    onSave(descriptionValue);
+  useEffect(() => {
+    setDescription(description);
+  }, [description]);
+
+  useEffect(() => {
+    if (isEditingDescription && inputRef.current) {
+      const textarea = inputRef.current;
+      const length = textarea.value.length;
+
+      // Set focus
+      textarea.focus();
+
+      // Đặt cursor ở cuối
+      textarea.setSelectionRange(length, length);
+    }
+  }, [isEditingDescription]);
+
+  const handleSave = async () => {
+    await onSave(descriptionValue);
+    setIsEditingDescription(false);
+  };
+
+  const handleCancel = () => {
+    setDescription(description);
     setIsEditingDescription(false);
   };
 
@@ -33,34 +59,31 @@ function DescriptionSection({
       ) : isEditingDescription ? (
         <div>
           <Textarea
+            ref={inputRef}
             value={descriptionValue}
             onChange={(e) => setDescription(e.target.value)}
-            onBlur={() => setIsEditingDescription(false)}
             placeholder="Thêm mô tả chi tiết hơn..."
             className="min-h-[100px] mb-4"
             autoFocus
           />
 
           <div className="flex items-center justify-end w-full">
-            <Button
-              variant="secondary"
-              className="mr-2"
-              onClick={() => {
-                setIsEditingDescription(false);
-                setDescription("");
-              }}
-            >
+            <Button variant="secondary" className="mr-2" onClick={handleCancel}>
               Hủy bỏ
             </Button>
-            <Button onClick={handleSave}>Lưu</Button>
+            <Button onClick={handleSave} className="min-w-[60px]">
+              {isUpdating ? <LoaderCircle className="animate-spin" /> : "Lưu"}
+            </Button>
           </div>
         </div>
       ) : (
         <div
-          className="min-h-[100px] p-3 text-gray-400 rounded border border-input cursor-pointer hover:bg-muted/50"
+          className="min-h-[100px] p-3 rounded border border-input cursor-pointer hover:bg-muted/50"
           onClick={() => setIsEditingDescription(true)}
         >
-          {descriptionValue || "Thêm mô tả chi tiết hơn..."}
+          {descriptionValue || (
+            <span className="text-sm text-gray-500">Thêm mô tả chi tiết hơn...</span>
+          )}
         </div>
       )}
     </div>

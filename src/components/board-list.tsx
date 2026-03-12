@@ -1,6 +1,7 @@
 // import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProjectItem } from "@/types/project";
+import randomColor from "randomcolor"
 
 interface BoardListProps {
   className?: string;
@@ -9,39 +10,31 @@ interface BoardListProps {
 }
 
 const BoardItem = ({ board, onClick }: { board: ProjectItem; onClick?: (boardId: string) => void }) => {
+  const projectColor = randomColor()
+
   return (
-    <button
+    <div
       key={board.id}
       onClick={() => onClick?.(board.id)}
-      className="w-full p-4 bg-white border group border-gray-200 rounded-lg hover:bg-gray-50 shadow-md transition-all text-left"
+      className="w-full cursor-pointer bg-white group rounded-lg shadow-[0px_1px_1px_#1E1F2140,0px_0px_1px_#1E1F214F] hover:bg-gray-50 transition-all text-left overflow-hidden"
     >
-      {/* Title */}
-      <h3 className="text-base font-semibold text-gray-900 group-hover:text-blue-800 mb-2">
-        {board.name}
-      </h3>
+      <div className="h-22 group-hover:brightness-75 transition-all" style={{ backgroundColor: projectColor }}></div>
+      <div className="p-3 flex gap-2 items-center justify-between">
+        {/* Title */}
+        <span className="text-base text-gray-700">
+          {board.name}
+        </span>
 
-      {/* Creator Info */}
-      <div className="flex items-center gap-2">
-        {/* {board.createdBy?.avatar ? (
-          <img
-            src={board.createdBy?.avatar}
-            alt={board.createdBy?.name}
-            className="w-5 h-5 rounded-full"
-          />
-        ) : (
-          <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
-            <User className="w-3 h-3 text-gray-600" />
-          </div>
-        )} */}
+        {/* Creator Info */}
         <span className="text-sm text-gray-600">{board.owner}</span>
       </div>
-    </button>
+    </div>
   );
 };
 
 const BoardList = ({ boards, className, onBoardClick }: BoardListProps) => {
   return (
-    <div className={cn("space-y-3 overflow-y-auto custom-scrollbar pr-2 py-4", className)}>
+    <div className={cn("overflow-y-auto custom-scrollbar pr-2 grid grid-cols-4 gap-3 p-0.5", className)}>
       {boards.map((board: ProjectItem) => (
         <BoardItem key={board.id} board={board} onClick={onBoardClick} />
       ))}

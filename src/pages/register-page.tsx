@@ -59,12 +59,12 @@ export default function RegisterPage() {
           <div className="bg-white rounded-xl shadow-lg p-8">
             {/* Logo & Title */}
             <div className="text-center mb-8">
-              {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-lg mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-lg mb-4">
                 <span className="text-2xl font-bold">T</span>
-              </div> */}
-              <div className="inline-flex items-center justify-center">
-                <img src="src\assets\trucllo.png" className="h-14" />
               </div>
+              {/* <div className="inline-flex items-center justify-center">
+                <img src="src\assets\trucllo.png" className="h-14" />
+              </div> */}
               <h1 className="text-2xl! font-bold text-gray-900 mb-2">Đăng ký tài khoản Trucllo</h1>
               <p className="text-gray-600">Tạo tài khoản mới để bắt đầu!</p>
             </div>

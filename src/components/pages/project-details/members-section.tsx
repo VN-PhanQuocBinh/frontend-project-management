@@ -1,9 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import UserAvatar from "@/components/user-avatar";
 
 import type { Task, TaskAssignee } from "@/types/task";
 import { useProjectStore } from "@/stores/project-store";
@@ -18,63 +18,37 @@ interface MembersSectionProps {
   setTask: React.Dispatch<React.SetStateAction<Task | null>>;
 }
 
-// const avatarColors = [
-//   {
-//     bg: "bg-red-500",
-//     text: "text-white",
-//   },
-//   {
-//     bg: "bg-green-500",
-//     text: "text-white",
-//   },
-//   {
-//     bg: "bg-blue-500",
-//     text: "text-white",
-//   },
-//   {
-//     bg: "bg-yellow-500",
-//     text: "text-white",
-//   },
-//   {
-//     bg: "bg-purple-500",
-//     text: "text-white",
-//   },
-//   {
-//     bg: "bg-pink-500",
-//     text: "text-white",
-//   },
-// ];
-
 function MembersSection({
   addedMembers = [],
   task,
   className,
   isLoading,
-  setTask
+  setTask,
 }: MembersSectionProps) {
-  const { currentActiveProject } = useProjectStore()
+  const { currentActiveProject } = useProjectStore();
 
-  
   const notAddedMembers = useMemo(() => {
-    return currentActiveProject?.projectMembers.filter(
-      (member) => !addedMembers.some((added) => added.user.id === member.user.id)
-    ) || [];
-  }, [addedMembers, currentActiveProject])
+    return (
+      currentActiveProject?.projectMembers.filter(
+        (member) => !addedMembers.some((added) => added.user.id === member.user.id),
+      ) || []
+    );
+  }, [addedMembers, currentActiveProject]);
 
   const handleAddAssignee = async (userId: string) => {
     const addedUser = await addAssignee({
       userId,
       taskId: task?.id || "",
       projectId: currentActiveProject?.id || "",
-    })
-    
+    });
+
     setTask((prev) => {
       if (!prev) return prev;
       const clonedTask = { ...prev };
       clonedTask.taskAssignees = [...(clonedTask.taskAssignees || []), { user: addedUser }];
       return clonedTask;
     });
-  }
+  };
 
   return (
     <div className={cn("", className)}>
@@ -85,14 +59,11 @@ function MembersSection({
         ) : (
           <>
             {addedMembers.map((member) => (
-              <Avatar key={member.user.id} className="size-8">
-                <AvatarImage src={member.user.avatar || undefined} className="" />
-                <AvatarFallback>
-                  <span>
-                    {member.user.username[0].toUpperCase()}
-                  </span>
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                key={member.user.id}
+                username={member.user.username}
+                avatar={member.user.avatar || ""}
+              />
             ))}
 
             <Popover>
@@ -111,17 +82,18 @@ function MembersSection({
                         className="flex items-center justify-between p-2 hover:bg-muted rounded"
                       >
                         <div className="flex items-center gap-2">
-                          <Avatar className="size-8">
-                            <AvatarImage src={member.user.avatar || undefined} />
-                            <AvatarFallback>
-                              <span>
-                                {member.user.username[0].toUpperCase()}
-                              </span>
-                            </AvatarFallback>
-                          </Avatar>
+                          <UserAvatar
+                            key={member.user.id}
+                            username={member.user.username}
+                            avatar={member.user.avatar || ""}
+                          />
                           <span className="text-sm">{member.user.email}</span>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => handleAddAssignee(member.user.id)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleAddAssignee(member.user.id)}
+                        >
                           <PlusIcon className="h-4 w-4" />
                         </Button>
                       </div>

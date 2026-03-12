@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Card, Column, Project, User } from "@/types/project";
+import type { Card, Column, Project, ProjectMember, User } from "@/types/project";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import axiosClient from "./axios-client";
 import { useProjectStore } from "@/stores/project-store";
@@ -16,10 +16,7 @@ export const createProjectAPI = async (projectData: { name: string }) => {
   useProjectStore.getState().setProjects(currentProjects);
 };
 
-export const updateProjectDetailsAPI = async (
-  projectId: UniqueIdentifier,
-  updateData: Project,
-) => {
+export const updateProjectDetailsAPI = async (projectId: UniqueIdentifier, updateData: Project) => {
   // Placeholder for API call to update project details
   console.log("Gọi API update project details trong file project.api.ts");
   axiosClient.put(`/projects/${projectId}`, updateData);
@@ -33,9 +30,7 @@ export const moveCardToDifferentColumnAPI = async (updateData: {
   nexttaskOrderIds: UniqueIdentifier[] | undefined;
 }) => {
   // Placeholder for API call to move card to different column
-  console.log(
-    "Gọi API move card to different column trong file project.api.ts",
-  );
+  console.log("Gọi API move card to different column trong file project.api.ts");
 
   axiosClient.put(`/board-columns/${updateData.prevColumnId}`, {
     taskOrderIds: updateData.prevtaskOrderIds,
@@ -63,10 +58,7 @@ export const createNewColumnAPI = async (columnData: {
   name: string;
   projectId: string;
 }): Promise<Column> => {
-  const createdColumn: Column = await axiosClient.post(
-    "/board-columns",
-    columnData,
-  );
+  const createdColumn: Column = await axiosClient.post("/board-columns", columnData);
   return createdColumn;
 };
 
@@ -92,8 +84,13 @@ export const deleteTaskAPI = async (taskId: string) => {
 export const addMemberToProjectAPI = async (memberData: {
   email: string;
   projectId: string;
-  role: "OWNER" | "MEMBER";
+  role: ProjectMember["role"];
 }): Promise<User> => {
-  const res = await axiosClient.post('/project-members', memberData);
+  const res = await axiosClient.post("/project-members", memberData);
   return res.data.user as User;
+};
+
+export const getAllProjectMembersAPI = async (projectId: string): Promise<ProjectMember[]> => {
+  const res = await axiosClient.get(`/project-members/project/${projectId}`);
+  return res.data;
 };

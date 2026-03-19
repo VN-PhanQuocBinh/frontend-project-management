@@ -33,7 +33,7 @@ export interface User {
 
 export interface ProjectMember {
   user: User,
-  role: 'OWNER' | 'MEMBER';
+  role: 'OWNER' | 'MEMBER' | 'MANAGER';
 }
 
 export interface Project {

@@ -166,7 +166,7 @@ function CommentSection({ taskId, className }: CommentSectionProps) {
     onCommentDeleted: handleCommentDeleted,
   });
   const displayComments = useMemo(() => {
-    return [...comments].reverse();
+    return [...comments].filter(Boolean).reverse();
   }, [comments]);
 
   useEffect(() => {

@@ -7,20 +7,19 @@ export const createComment = async (commentData: {
   userId: string;
 }): Promise<Comment> => {
   const response = await axiosClient.post("/comments", commentData);
-  return response.data;
+  return response as unknown as Comment;
 };
 
 export const getCommentsByTaskId = async (taskId: string): Promise<Comment[]> => {
   const response = await axiosClient.get(`/comments/task/${taskId}`);
-  return response.data;
+  return response as unknown as Comment[];
 };
 
 export const updateComment = async (commentId: string, content: string): Promise<Comment> => {
   const response = await axiosClient.put(`/comments/${commentId}`, { content });
-  return response.data;
+  return response as unknown as Comment;
 };
 
 export const deleteComment = async (commentId: string): Promise<void> => {
-  const response = await axiosClient.delete(`/comments/${commentId}`);
-  return response.data;
+  await axiosClient.delete(`/comments/${commentId}`);
 };

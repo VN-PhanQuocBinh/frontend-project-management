@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { UserPlus, ChevronDown, LoaderCircle } from "lucide-react";
-import { addMemberToProjectAPI, getAllProjectMembersAPI } from "@/api/project.api";
+import { addMemberToProjectAPI, getAllProjectMembersAPI, updateMemberRoleAPI } from "@/api/project.api";
 import { useProjectStore } from "@/stores/project-store";
 import type { Project, ProjectMember, User } from "@/types/project";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ import UserAvatar from "@/components/user-avatar";
 
 function ProjectSharing() {
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState<"Owner" | "Member">("Member");
+  const [inviteRole, setInviteRole] = useState<"Owner" | "Member" | "Manager">("Member");
   const [members, setMembers] = useState<ProjectMember[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,12 +51,32 @@ function ProjectSharing() {
     }
   }, []);
 
-  const handleRoleChange = (memberId: string, newRole: ProjectMember["role"]) => {
+  const handleRoleChange = async (memberId: string, newRole: ProjectMember["role"]) => {
     setMembers((prev) => {
       return prev.map((member) =>
         member.user.id === memberId ? { ...member, role: newRole } : member,
       );
     });
+
+    try {
+      await updateMemberRoleAPI({
+        email: members.find((m) => m.user.id === memberId)?.user.email as string,
+        projectId: currentActiveProject?.id as string,
+        role: newRole,
+      });
+
+      const newProject: Project = { ...currentActiveProject } as Project;
+      const memberIndex = newProject.projectMembers.findIndex((m) => m.user.id === memberId);
+      if (memberIndex !== -1) {
+        newProject.projectMembers[memberIndex].role = newRole;
+        setCurrentActiveProject(newProject);
+      }
+
+      toast.success("Cập nhật vai trò thành công!");
+    } catch (error: any) {
+      console.error("Failed to update member role:", error);
+      toast.error("Cập nhật vai trò thất bại!");
+    }
   };
 
   const handleShare = async () => {
@@ -66,15 +86,16 @@ function ProjectSharing() {
       const newMember: User = await addMemberToProjectAPI({
         email: inviteEmail,
         projectId: currentActiveProject?.id as string, // Replace with actual project ID
-        role: inviteRole.toUpperCase() as "OWNER" | "MEMBER",
+        role: inviteRole.toUpperCase() as "OWNER" | "MEMBER" | "MANAGER",
       });
 
       const newProject: Project = { ...currentActiveProject } as Project;
       newProject.projectMembers.push({
         user: newMember,
-        role: inviteRole.toUpperCase() as "OWNER" | "MEMBER",
+        role: inviteRole.toUpperCase() as "OWNER" | "MEMBER" | "MANAGER",
       });
 
+      setMembers((prev) => [...prev, { user: newMember, role: inviteRole.toUpperCase() as "OWNER" | "MEMBER" | "MANAGER" }]);
       setCurrentActiveProject(newProject);
       setInviteEmail("");
       toast.success(`Thêm thành viên ${newMember.username} với vai trò ${inviteRole} thành công!`);
@@ -113,14 +134,15 @@ function ProjectSharing() {
             />
             <DropdownMenu>
               <DropdownMenuTrigger disabled={isLoading} asChild>
-                <Button variant="outline" className="min-w-25 justify-between">
+                <Button variant="outline" className="min-w-25 justify-between uppercase">
                   {inviteRole}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setInviteRole("Member")}>Member</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setInviteRole("Owner")}>Owner</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setInviteRole("Member")}>MEMBER</DropdownMenuItem>
+                {/* <DropdownMenuItem onClick={() => setInviteRole("Owner")}>OWNER</DropdownMenuItem> */}
+                <DropdownMenuItem onClick={() => setInviteRole("Manager")}>MANAGER</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
@@ -194,10 +216,13 @@ function ProjectSharing() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => handleRoleChange(member.user.id, "MEMBER")}>
-                      Member
+                      MEMBER
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleRoleChange(member.user.id, "OWNER")}>
-                      Owner
+                    {/* <DropdownMenuItem onClick={() => handleRoleChange(member.user.id, "OWNER")}>
+                      OWNER
+                    </DropdownMenuItem> */}
+                    <DropdownMenuItem onClick={() => handleRoleChange(member.user.id, "MANAGER")}>
+                      MANAGER
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

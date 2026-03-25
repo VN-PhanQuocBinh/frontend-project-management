@@ -55,9 +55,9 @@ function CommentItem({
 
   const formatDate = (dateString: string) => {
     // Normalize date string to ensure it can be parsed correctly across different browsers
-    const normalized = dateString.replace(/(\.\d{3})\d+/, "$1") + "Z"; // UTC -> UTC +7
+    // const normalized = dateString.replace(/(\.\d{3})\d+/, "$1") + "Z"; // UTC -> UTC +7
 
-    const date = new Date(normalized);
+    const date = new Date(dateString);
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();
     console.log("Time difference in ms:", diffInMs);

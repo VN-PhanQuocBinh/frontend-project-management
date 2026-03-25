@@ -2,7 +2,7 @@ import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip } from "./ui/tooltip";
 import { subscribeNotification } from "@/hooks/useNotification";
-import { getNotificationById, markNotificationsRead } from "@/api/notification.api";
+import { getNotificationById } from "@/api/notification.api";
 import type { Notification } from "@/types/notification";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";

@@ -45,6 +45,11 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
 
         try {
           const taskData = await getTaskById(cardId);
+
+          const dateString = taskData.dueDate;
+          const normalized = dateString.replace(/(\.\d{3})\d+/, "$1") + "Z"; // UTC -> UTC +7
+          taskData.dueDate = new Date(normalized).toISOString();
+
           setTask(taskData);
         } catch (error) {
           console.error("Failed to fetch task details:", error);
@@ -60,11 +65,19 @@ export function DetailModal({ open, cardId, onOpenChange }: DetailModalProps) {
 
   const handleUpdateTask = useCallback(
     async (updatedTask: Partial<Task>) => {
+      console.log("Updating task with data:", updatedTask);
+
       setIsUpdatingTask(true);
       try {
         if (!cardId) return;
 
         const newTask = await updateTask(cardId, updatedTask);
+        console.log("Task updated successfully:", newTask);
+
+        const dateString = newTask.dueDate;
+        const normalized = dateString.replace(/(\.\d{3})\d+/, "$1") + "Z"; // UTC -> UTC +7
+        newTask.dueDate = new Date(normalized).toISOString();
+
         setTask(newTask);
       } catch (error) {
         console.error("Failed to update task:", error);

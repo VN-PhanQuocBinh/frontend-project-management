@@ -1,5 +1,4 @@
 import axiosClient from "./axios-client";
-import type { Notification } from "@/types/notification";
 
 export const getNotificationById = async (notificationId: string) => {
   const response = await axiosClient.get(`/notifications/user/${notificationId}`);

@@ -94,3 +94,13 @@ export const getAllProjectMembersAPI = async (projectId: string): Promise<Projec
   const res = await axiosClient.get(`/project-members/project/${projectId}`);
   return res.data;
 };
+
+// Update member role in project
+export const updateMemberRoleAPI = async (memberData: {
+  email: string;
+  projectId: string;
+  role: ProjectMember["role"];
+}) => {
+  const res = await axiosClient.put("/project-members", memberData);
+  return res.data.user as User;
+}

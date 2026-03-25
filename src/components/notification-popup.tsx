@@ -53,18 +53,6 @@ const NotificationPopup = ({ children }: NotificationPopupProps) => {
   }, [id]);
 
   // Mark all notifications as read when popup opens
-  React.useEffect(() => {
-    if (!isOpen || !id) return;
-    markNotificationsRead(id)
-      .then(() => {
-        setNotifications((prev) =>
-          prev.map((n) => ({ ...n, isRead: true }))
-        );
-      })
-      .catch((err) => {
-        console.error("Failed to mark notifications as read:", err);
-      });
-  }, [isOpen, id]);
 
   const getInitials = (name: string) => {
     if (!name) return "?";

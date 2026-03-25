@@ -12,7 +12,7 @@ export const createComment = async (commentData: {
 
 export const getCommentsByTaskId = async (taskId: string): Promise<Comment[]> => {
   const response = await axiosClient.get(`/comments/task/${taskId}`);
-  return response as unknown as Comment[];
+  return response.data as unknown as Comment[];
 };
 
 export const updateComment = async (commentId: string, content: string): Promise<Comment> => {

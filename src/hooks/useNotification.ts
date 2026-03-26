@@ -3,11 +3,9 @@ import { BASE_URL } from "@/config/env-vars";
 export const subscribeNotification = (onMessage: any) => {
   const authStorage = localStorage.getItem("auth-storage");
   const id = JSON.parse(authStorage || "{}").state.user.id;
-  const eventSource = new EventSource(
-    "http://localhost:8080/api/v1/notifications/subscribe" + `/${id}`,
-    // `${BASE_URL}/notifications/subscribe/${id}`,
-    { withCredentials: true },
-  );
+  const eventSource = new EventSource(`${BASE_URL}/notifications/subscribe/${id}`, {
+    withCredentials: true,
+  });
 
   eventSource.onopen = (event) => {
     console.log("SSE connected! Event:", event);

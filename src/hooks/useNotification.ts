@@ -3,7 +3,7 @@ import { BASE_URL } from "@/config/env-vars";
 export const subscribeNotification = (onMessage: any) => {
   const authStorage = localStorage.getItem("auth-storage");
   const id = JSON.parse(authStorage || "{}").state.user.id;
-  const eventSource = new EventSource(`${BASE_URL}/notifications/subscribe` + `/${id}`, {
+  const eventSource = new EventSource(`${BASE_URL}/notifications/subscribe/${id}`, {
     withCredentials: true,
   });
 
